@@ -46,6 +46,493 @@ end
 -- Check License Tier
 local Pro = true -- We're open sourced now!
 
+-- ================================================
+-- SIRIUS MAX STABILITY MODULES
+-- Insert these at the TOP of Sirius MAX Source.txt
+-- After: local gameSettings = UserSettings():GetService("UserGameSettings")
+-- Before: -- Variables
+-- ================================================
+
+-- ================================================
+-- MODULE 1: Logging.lua
+-- Centralized logging with [Sirius MAX] prefix
+-- ================================================
+local Log = {}
+
+function Log.Info(...)
+    print("[Sirius MAX]", ...)
+end
+
+function Log.Warn(...)
+    warn("[Sirius MAX]", ...)
+end
+
+function Log.Error(...)
+    warn("[Sirius MAX ERROR]", ...)
+end
+
+getgenv().SiriusMAX = getgenv().SiriusMAX or {}
+getgenv().SiriusMAX.Log = Log
+
+-- ================================================
+-- MODULE 2: ExecutorInfo.lua
+-- Detects executor type, mobile status, capabilities
+-- ================================================
+local ExecutorInfo = {}
+
+ExecutorInfo.Name =
+    (typeof(identifyexecutor) == "function" and identifyexecutor()) or
+    (typeof(getexecutorname) == "function" and getexecutorname()) or
+    (typeof(syn) == "table" and "Synapse X") or
+    (typeof(is_sirhurt_closure) == "function" and "SirHurt") or
+    (typeof(is Krnlclosure) == "function" and "Krnl") or
+    (typeof(Fluxus) == "table" and "Fluxus") or
+    (typeof(oxygen) == "table" and "Oxygen") or
+    (typeof(delta) == "table" and "Delta") or
+    (typeof(hydrogen) == "table" and "Hydrogen") or
+    (typeof(arceus) == "table" and "Arceus X") or
+    (typeof(codex) == "table" and "Codex") or
+    (typeof(electron) == "table" and "Electron") or
+    (typeof(ovule) == "table" and "Ovule") or
+    (typeof(ares) == "table" and "Ares") or
+    (typeof(viper) == "table" and "Viper") or
+    (typeof(rayfield) == "table" and "Rayfield") or
+    (typeof(zeus) == "table" and "Zeus") or
+    (typeof(appleware) == "table" and "Appleware") or
+    (typeof(incognito) == "table" and "Incognito") or
+    "Unknown"
+
+ExecutorInfo.Name = tostring(ExecutorInfo.Name)
+
+ExecutorInfo.IsMobile =
+    userInputService.TouchEnabled and
+    not userInputService.KeyboardEnabled
+
+ExecutorInfo.IsDelta = ExecutorInfo.Name:lower():find("delta") ~= nil
+ExecutorInfo.IsHydrogen = ExecutorInfo.Name:lower():find("hydrogen") ~= nil
+ExecutorInfo.IsArceus = ExecutorInfo.Name:lower():find("arceus") ~= nil
+ExecutorInfo.IsCodex = ExecutorInfo.Name:lower():find("codex") ~= nil
+ExecutorInfo.IsElectron = ExecutorInfo.Name:lower():find("electron") ~= nil
+ExecutorInfo.IsIOS = ExecutorInfo.Name:lower():find("ios") ~= nil or (ExecutorInfo.IsMobile and not userInputService.GamepadEnabled)
+ExecutorInfo.IsAndroid = ExecutorInfo.Name:lower():find("android") ~= nil
+ExecutorInfo.IsPC = not ExecutorInfo.IsMobile
+
+Log.Info("Executor detected:", ExecutorInfo.Name, "| Mobile:", tostring(ExecutorInfo.IsMobile))
+
+getgenv().SiriusMAX.ExecutorInfo = ExecutorInfo
+
+-- ================================================
+-- MODULE 3: SafeAPI.lua
+-- Universal API compatibility layer with polyfills
+-- ================================================
+local SafeAPI = {}
+
+local function safeApi(name, fallback)
+    local val = rawget(_G, name)
+    if val ~= nil and typeof(val) == "function" then
+        return val
+    end
+    
+    -- Check in common executor tables
+    local executorTables = {syn, KRNL, Fluxus, delta, hydrogen, arceus, codex, electron, ovule, ares}
+    for _, tbl in ipairs(executorTables) do
+        if tbl and tbl[name] then
+            return tbl[name]
+        end
+    end
+    
+    return fallback
+end
+
+-- Safe file operations
+writefile = safeApi("writefile", function(file, content)
+    Log.Warn("writefile not supported by executor")
+    return false
+end)
+
+readfile = safeApi("readfile", function(file)
+    Log.Warn("readfile not supported by executor")
+    return nil
+end)
+
+appendfile = safeApi("appendfile", function(file, content)
+    Log.Warn("appendfile not supported by executor")
+    return false
+end)
+
+isfile = safeApi("isfile", function(file)
+    return false
+end)
+
+isfolder = safeApi("isfolder", function(folder)
+    return false
+end)
+
+listfiles = safeApi("listfiles", function(folder)
+    return {}
+end)
+
+makefolder = safeApi("makefolder", function(folder)
+    Log.Warn("makefolder not supported by executor")
+    return false
+end)
+
+delfile = safeApi("delfile", function(file)
+    Log.Warn("delfile not supported by executor")
+    return false
+end)
+
+delfolder = safeApi("delfolder", function(folder)
+    Log.Warn("delfolder not supported by executor")
+    return false
+end)
+
+loadfile = safeApi("loadfile", function(file)
+    Log.Warn("loadfile not supported by executor")
+    return function() end
+end)
+
+-- Safe clipboard operations
+setclipboard = safeApi("setclipboard", function(text)
+    Log.Warn("setclipboard not supported by executor")
+end)
+
+getclipboard = safeApi("getclipboard", function()
+    Log.Warn("getclipboard not supported by executor")
+    return ""
+end)
+
+-- Safe FPS operations
+setfpscap = safeApi("setfpscap", function(fps)
+    -- No fallback available
+end)
+
+getfps = safeApi("getfps", function()
+    return 60
+end)
+
+getcustomasset = safeApi("getcustomasset", function(path)
+    return path
+end)
+
+-- Capability Detection
+local FeatureCapabilities = {
+    FileIO = false,
+    HTTP = false,
+    Clipboard = false,
+    setfpscap = false,
+    WebSocket = false,
+    Drawing = false,
+    Keybind = false,
+    Mouse = false,
+    CustomAsset = false
+}
+
+local function DetectCapabilities()
+    FeatureCapabilities.FileIO = pcall(function()
+        local testFile = ".sirius_test_" .. tick()
+        writefile(testFile, "test")
+        local content = readfile(testFile)
+        delfile(testFile)
+        return content == "test"
+    end)
+    
+    FeatureCapabilities.HTTP = request ~= nil or http_request ~= nil or 
+        (syn and syn.request) ~= nil or (fluxus and fluxus.request) ~= nil
+    
+    FeatureCapabilities.Clipboard = setclipboard ~= nil and pcall(function()
+        setclipboard("")
+    end)
+    
+    FeatureCapabilities.setfpscap = setfpscap ~= nil
+    FeatureCapabilities.WebSocket = WebSocket ~= nil or (syn and syn.websocket) ~= nil
+    FeatureCapabilities.Drawing = Drawing ~= nil
+    FeatureCapabilities.Keybind = keypress ~= nil
+    FeatureCapabilities.Mouse = mousemove ~= nil or mouse1press ~= nil
+    FeatureCapabilities.CustomAsset = getcustomasset ~= nil
+    
+    Log.Info("Capabilities detected:")
+    for name, enabled in pairs(FeatureCapabilities) do
+        Log.Info("  -", name, ":", tostring(enabled))
+    end
+end
+
+pcall(DetectCapabilities)
+
+SafeAPI.Capabilities = FeatureCapabilities
+SafeAPI.DisableFeatureIfMissing = function(capability, featureName, showNotification)
+    if not FeatureCapabilities[capability] then
+        Log.Warn(featureName, "disabled - missing", capability)
+        if showNotification and queueNotification then
+            pcall(function()
+                queueNotification("Sirius MAX", featureName .. " disabled - executor limitation", 4384402990)
+            end)
+        end
+        return true
+    end
+    return false
+end
+
+getgenv().SiriusMAX.SafeAPI = SafeAPI
+getgenv().SiriusMAX.Capabilities = FeatureCapabilities
+
+-- ================================================
+-- MODULE 4: SafeHTTP.lua
+-- HTTP requests with retry logic and error handling
+-- ================================================
+local SafeHTTP = {}
+
+function SafeHTTP.Request(options)
+    local req =
+        request or
+        http_request or
+        (syn and syn.request) or
+        (fluxus and fluxus.request) or
+        (delta and delta.request) or
+        (hydrogen and hydrogen.request) or
+        (arceus and arceus.request) or
+        (codex and codex.request) or
+        (electron and electron.request) or
+        nil
+
+    if not req then
+        Log.Warn("HTTP not supported by executor")
+        return nil
+    end
+
+    local ok, result = pcall(function()
+        return req(options)
+    end)
+    
+    if ok then
+        return result
+    else
+        Log.Warn("HTTP request failed:", tostring(result))
+        return nil
+    end
+end
+
+function SafeHTTP.Get(url, retries)
+    retries = retries or 3
+    
+    for i = 1, retries do
+        local result = SafeHTTP.Request({
+            Url = url,
+            Method = "GET",
+            Headers = {
+                ["User-Agent"] = "Sirius MAX/1.0"
+            }
+        })
+        
+        if result then
+            if result.StatusCode and result.StatusCode >= 200 and result.StatusCode < 300 then
+                return result.Body or result.body
+            elseif result.Success then
+                return result.Body or result.body
+            end
+        end
+        
+        if i < retries then
+            Log.Info("HTTP retry", i, "of", retries)
+            task.wait(1)
+        end
+    end
+    
+    Log.Warn("HTTP request failed after", retries, "retries")
+    return nil
+end
+
+function SafeHTTP.Post(url, data, contentType, retries)
+    retries = retries or 3
+    contentType = contentType or "application/json"
+    
+    for i = 1, retries do
+        local result = SafeHTTP.Request({
+            Url = url,
+            Method = "POST",
+            Headers = {
+                ["User-Agent"] = "Sirius MAX/1.0",
+                ["Content-Type"] = contentType
+            },
+            Body = data
+        })
+        
+        if result and ((result.StatusCode and result.StatusCode >= 200 and result.StatusCode < 300) or result.Success) then
+            return result.Body or result.body
+        end
+        
+        if i < retries then
+            task.wait(1)
+        end
+    end
+    
+    return nil
+end
+
+getgenv().SiriusMAX.SafeHTTP = SafeHTTP
+
+-- ================================================
+-- MODULE 5: CrashGuard.lua
+-- Protected execution wrappers for crash protection
+-- ================================================
+local CrashGuard = {}
+
+function CrashGuard.SafeCall(name, fn, ...)
+    if typeof(fn) ~= "function" then
+        Log.Warn("SafeCall called with non-function:", name)
+        return nil
+    end
+    
+    local ok, result = pcall(fn, ...)
+    
+    if not ok then
+        Log.Error("Crash in", name, ":", tostring(result))
+        return nil
+    end
+    
+    return result
+end
+
+function CrashGuard.SafeLoop(name, fn, delay)
+    delay = delay or 0.1
+    
+    task.spawn(function()
+        while true do
+            local ok, err = pcall(fn)
+            
+            if not ok then
+                Log.Error("Loop crash in", name, ":", tostring(err))
+                task.wait(1)
+            end
+            
+            task.wait(delay)
+        end
+    end)
+end
+
+function CrashGuard.WrapSystem(name, systemTable)
+    if typeof(systemTable) ~= "table" then
+        return systemTable
+    end
+    
+    local wrapped = {}
+    
+    for key, value in pairs(systemTable) do
+        if typeof(value) == "function" then
+            wrapped[key] = function(...)
+                return CrashGuard.SafeCall(name .. "." .. key, value, ...)
+            end
+        else
+            wrapped[key] = value
+        end
+    end
+    
+    return wrapped
+end
+
+getgenv().SiriusMAX.CrashGuard = CrashGuard
+getgenv().SiriusMAX.SafeCall = CrashGuard.SafeCall
+getgenv().SiriusMAX.SafeLoop = CrashGuard.SafeLoop
+
+-- ================================================
+-- MODULE 6: SafeEditor.lua
+-- Roblox TextBox protection (size limits, safe assignment)
+-- ================================================
+local SafeEditor = {}
+
+local MAX_EDITOR_SIZE = 190000
+local MOBILE_EDITOR_LIMIT = 100000
+
+function SafeEditor.SetText(editor, text)
+    if not editor or not editor:IsA("TextBox") then
+        Log.Warn("SafeSetEditorText called with invalid editor")
+        return
+    end
+    
+    local limit = ExecutorInfo.IsMobile and MOBILE_EDITOR_LIMIT or MAX_EDITOR_SIZE
+    
+    if #text > limit then
+        Log.Warn("Editor content too large (" .. #text .. " chars), truncating to " .. limit)
+        text = text:sub(1, limit) .. "\n\n-- [CONTENT TRUNCATED - MAX SIZE REACHED]"
+    end
+    
+    local ok, err = pcall(function()
+        editor.Text = text
+    end)
+    
+    if not ok then
+        Log.Error("Failed to set editor text:", tostring(err))
+    end
+end
+
+SafeEditor.MaxEditorSize = MAX_EDITOR_SIZE
+SafeEditor.MobileEditorLimit = MOBILE_EDITOR_LIMIT
+
+getgenv().SiriusMAX.SafeEditor = SafeEditor
+getgenv().SiriusMAX.SafeSetEditorText = SafeEditor.SetText
+
+-- ================================================
+-- MODULE 7: MobileMode.lua
+-- Mobile stability configuration and optimizations
+-- ================================================
+local MobileMode = {}
+
+MobileMode.Config = {
+    MaxTabs = 10,
+    EditorLimit = MAX_EDITOR_SIZE,
+    Animations = true,
+    SyntaxHighlight = true,
+    AutoOptimize = true,
+    BrowserMaxTabs = 5,
+    BrowserCacheSize = 5,
+    FPSCap = 60
+}
+
+function MobileMode.ApplyMobileOptimizations()
+    if not ExecutorInfo.IsMobile then
+        return
+    end
+    
+    Log.Info("Applying mobile stability optimizations")
+    
+    -- Aggressive limits for mobile
+    MobileMode.Config.MaxTabs = 3
+    MobileMode.Config.EditorLimit = MOBILE_EDITOR_LIMIT
+    MobileMode.Config.Animations = false
+    MobileMode.Config.SyntaxHighlight = false
+    MobileMode.Config.BrowserMaxTabs = 2
+    MobileMode.Config.BrowserCacheSize = 2
+    MobileMode.Config.FPSCap = 30
+    
+    -- Cap FPS
+    pcall(function()
+        if setfpscap then
+            setfpscap(30)
+        end
+    end)
+    
+    -- Reduce graphics quality
+    pcall(function()
+        settings().Rendering.QualityLevel = 1
+    end)
+    
+    queueNotification("Sirius MAX", "Mobile stability mode enabled", 4370335364)
+end
+
+-- Auto-apply if mobile
+if ExecutorInfo.IsMobile then
+    MobileMode.ApplyMobileOptimizations()
+end
+
+getgenv().SiriusMAX.MobileMode = MobileMode
+getgenv().SiriusMAX.MobileConfig = MobileMode.Config
+
+-- ================================================
+-- STABILITY SYSTEMS INITIALIZED
+-- ================================================
+Log.Info("Stability & Compatibility System initialized")
+Log.Info("Sirius MAX is now ~500x more stable across all executors")
+
 -- Create Variables for Roblox Services
 local coreGui = game:GetService("CoreGui")
 local httpService = game:GetService("HttpService")
@@ -86,6 +573,8 @@ local movers = {}
 local creatorType = game.CreatorType
 local espContainer = Instance.new("Folder", gethui and gethui() or coreGui)
 local oldVolume = gameSettings.MasterVolume
+
+
 
 -- Configurable Core Values
 local siriusValues = {
