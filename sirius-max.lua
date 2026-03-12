@@ -7467,7 +7467,7 @@ sbTitle.TextSize = 18
 sbTitle.Font = Enum.Font.SourceSansBold
 sbTitle.Parent = scriptbloxPanel
 
-local sbClose = Instance.new("TextButton")
+sbClose = Instance.new("TextButton")
 sbClose.Name = "Close"
 sbClose.Size = UDim2.new(0, 30, 0, 30)
 sbClose.Position = UDim2.new(1, -35, 0, 5)
@@ -7479,7 +7479,7 @@ sbClose.Font = Enum.Font.SourceSansBold
 sbClose.Parent = scriptbloxPanel
 
 -- Auto-execute Toggle
-local autoExecToggle = Instance.new("TextButton")
+autoExecToggle = Instance.new("TextButton")
 autoExecToggle.Name = "AutoExecToggle"
 autoExecToggle.Size = UDim2.new(0, 150, 0, 35)
 autoExecToggle.Position = UDim2.new(0, 15, 0, 50)
@@ -7488,13 +7488,13 @@ autoExecToggle.Text = "Auto-Execute: OFF"
 autoExecToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
 autoExecToggle.TextSize = 12
 autoExecToggle.Font = Enum.Font.SourceSansBold
-local autoExecCorner = Instance.new("UICorner")
+autoExecCorner = Instance.new("UICorner")
 autoExecCorner.CornerRadius = UDim.new(0, 6)
 autoExecCorner.Parent = autoExecToggle
 autoExecToggle.Parent = scriptbloxPanel
 
 -- Search Button
-local searchBtn = Instance.new("TextButton")
+searchBtn = Instance.new("TextButton")
 searchBtn.Name = "Search"
 searchBtn.Size = UDim2.new(0, 120, 0, 35)
 searchBtn.Position = UDim2.new(0.5, -60, 0, 50)
@@ -7503,7 +7503,7 @@ searchBtn.Text = "🔍 Search Game"
 searchBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 searchBtn.TextSize = 12
 searchBtn.Font = Enum.Font.SourceSansBold
-local searchCorner = Instance.new("UICorner")
+searchCorner = Instance.new("UICorner")
 searchCorner.CornerRadius = UDim.new(0, 6)
 searchCorner.Parent = searchBtn
 searchBtn.Parent = scriptbloxPanel
