@@ -5692,7 +5692,8 @@ while task.wait(1) do
 		if siriusValues.frameProfile.frameNotificationCooldown > 0 then
 			siriusValues.frameProfile.frameNotificationCooldown -= 1
 		end
-end)
+	end
+end
 
 -- =====================================================
 -- SIRIUS PRE-HYPERION TODO LIST IMPLEMENTATIONS
