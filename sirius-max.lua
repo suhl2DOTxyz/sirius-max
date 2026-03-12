@@ -82,15 +82,21 @@ local Pro = true -- We're open sourced now!
     S.ExecutorInfo.IsHydrogen = nm:find("hydrogen") ~= nil
     S.ExecutorInfo.IsMobile = S.ExecutorInfo.IsMobile or nm:find("ios") ~= nil or nm:find("android") ~= nil
     
-    -- Logging - attached to table
-    S.Log = function(m, ...) 
-        if m == "ERROR" then warn("[Sirius MAX]", ...) 
-        elseif m == "WARN" then warn("[Sirius MAX]", ...)
-        else print("[Sirius MAX]", ...) end 
-    end
-    S.Log.Info = function(...) S.Log("INFO", ...) end
-    S.Log.Warn = function(...) S.Log("WARN", ...) end
-    S.Log.Error = function(...) S.Log("ERROR", ...) end
+   -- Logging - attached to table
+S.Log = S.Log or {}
+local originalLog = S.Log.Log or function(m, ...)
+    if m == "ERROR" then warn("[Sirius MAX]", ...) 
+    elseif m == "WARN" then warn("[Sirius MAX]", ...)
+    else print("[Sirius MAX]", ...) end
+end
+
+-- Reassign the main function inside the table
+S.Log.Log = originalLog
+
+-- Table-based Info/Warn/Error wrappers
+S.Log.Info = function(...) S.Log.Log("INFO", ...) end
+S.Log.Warn = function(...) S.Log.Log("WARN", ...) end
+S.Log.Error = function(...) S.Log.Log("ERROR", ...) end
     
     -- Safe API polyfills - directly to _G
     local function ga(n) 
