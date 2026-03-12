@@ -85,7 +85,7 @@ ExecutorInfo.Name =
     (typeof(getexecutorname) == "function" and getexecutorname()) or
     (typeof(syn) == "table" and "Synapse X") or
     (typeof(is_sirhurt_closure) == "function" and "SirHurt") or
-    (typeof(is Krnlclosure) == "function" and "Krnl") or
+    (typeof(is_krnl_closure) == "function" and "Krnl") or
     (typeof(Fluxus) == "table" and "Fluxus") or
     (typeof(oxygen) == "table" and "Oxygen") or
     (typeof(delta) == "table" and "Delta") or
