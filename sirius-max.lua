@@ -5692,7 +5692,6 @@ while task.wait(1) do
 		if siriusValues.frameProfile.frameNotificationCooldown > 0 then
 			siriusValues.frameProfile.frameNotificationCooldown -= 1
 		end
-	end
 end)
 
 -- =====================================================
@@ -5719,6 +5718,7 @@ local function detectSpam(message, player)
 				capsCount = capsCount + 1
 			end
 		end
+	end
 	local capsRatio = letterCount > 0 and (capsCount / letterCount) * 100 or 0
 	if capsRatio >= capsThreshold then
 		return true, "Excessive capital letters"
