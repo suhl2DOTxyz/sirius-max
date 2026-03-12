@@ -47,34 +47,20 @@ end
 local Pro = true -- We're open sourced now!
 
 -- ================================================
--- SIRIUS MAX STABILITY MODULES (Optimized for Low Register Count)
+-- SIRIUS MAX STABILITY MODULES - ZERO LOCAL VERSION
+-- ================================================
 -- Insert after: local gameSettings = UserSettings():GetService("UserGameSettings")
--- Before: -- Variables
 -- ================================================
 
--- Use a single wrapped function to scope all locals
+-- NO LOCALS DECLARED HERE - All inside the IIFE
 (function()
-    -- Global SiriusMAX table
-    _G.SiriusMAX = _G.SiriusMAX or {}
-    local S = _G.SiriusMAX
+    -- Only local inside this scope - doesn't count against main script limit
+    local S = _G.SiriusMAX or {}
+    _G.SiriusMAX = S
     
-    -- ================================================
-    -- LOGGING (reuses single function with mode parameter)
-    -- ================================================
-    S.Log = function(mode, ...)
-        local prefix = mode == "ERROR" and "[Sirius MAX ERROR]" or "[Sirius MAX]"
-        if mode == "ERROR" or mode == "WARN" then warn(prefix, ...) else print(prefix, ...) end
-    end
-    S.Log.Info = function(...) S.Log("INFO", ...) end
-    S.Log.Warn = function(...) S.Log("WARN", ...) end
-    S.Log.Error = function(...) S.Log("ERROR", ...) end
-
-    -- ================================================
-    -- EXECUTOR DETECTION
-    -- ================================================
-    local uis = game:GetService("UserInputService")
+    -- Executor Info - stored in table, not locals
     S.ExecutorInfo = {
-        Name = (typeof(identifyexecutor) == "function" and identifyexecutor())
+        Name = tostring((typeof(identifyexecutor) == "function" and identifyexecutor())
             or (typeof(getexecutorname) == "function" and getexecutorname())
             or (typeof(syn) == "table" and "Synapse X")
             or (typeof(is_sirhurt_closure) == "function" and "SirHurt")
@@ -85,121 +71,108 @@ local Pro = true -- We're open sourced now!
             or (typeof(arceus) == "table" and "Arceus X")
             or (typeof(codex) == "table" and "Codex")
             or (typeof(electron) == "table" and "Electron")
-            or "Unknown",
-        IsMobile = uis.TouchEnabled and not uis.KeyboardEnabled
+            or "Unknown"),
+        IsMobile = (game:GetService("UserInputService")).TouchEnabled 
+            and not (game:GetService("UserInputService")).KeyboardEnabled
     }
-    S.ExecutorInfo.Name = tostring(S.ExecutorInfo.Name)
     
-    local n = S.ExecutorInfo.Name:lower()
-    S.ExecutorInfo.IsDelta = n:find("delta") ~= nil
-    S.ExecutorInfo.IsHydrogen = n:find("hydrogen") ~= nil
-    S.ExecutorInfo.IsArceus = n:find("arceus") ~= nil
-    S.ExecutorInfo.IsIOS = n:find("ios") ~= nil or (S.ExecutorInfo.IsMobile and not uis.GamepadEnabled)
-
-    -- ================================================
-    -- SAFE API POLYFILLS (single table, function-based)
-    -- ================================================
-    local function getapi(name)
-        if _G[name] then return _G[name] end
-        for _, t in pairs({syn, KRNL, Fluxus, delta, hydrogen, arceus, codex, electron}) do
-            if t and t[name] then return t[name] end
+    -- Set flags via string find
+    local nm = S.ExecutorInfo.Name:lower()
+    S.ExecutorInfo.IsDelta = nm:find("delta") ~= nil
+    S.ExecutorInfo.IsHydrogen = nm:find("hydrogen") ~= nil
+    S.ExecutorInfo.IsMobile = S.ExecutorInfo.IsMobile or nm:find("ios") ~= nil or nm:find("android") ~= nil
+    
+    -- Logging - attached to table
+    S.Log = function(m, ...) 
+        if m == "ERROR" then warn("[Sirius MAX]", ...) 
+        elseif m == "WARN" then warn("[Sirius MAX]", ...)
+        else print("[Sirius MAX]", ...) end 
+    end
+    S.Log.Info = function(...) S.Log("INFO", ...) end
+    S.Log.Warn = function(...) S.Log("WARN", ...) end
+    S.Log.Error = function(...) S.Log("ERROR", ...) end
+    
+    -- Safe API polyfills - directly to _G
+    local function ga(n) 
+        if _G[n] then return _G[n] end
+        for _,t in pairs({syn, KRNL, Fluxus, delta, hydrogen, arceus, codex, electron}) do
+            if t and t[n] then return t[n] end
         end
         return nil
     end
-
-    -- Create fallbacks that warn once
+    
     local warned = {}
-    local function warnonce(api)
-        if not warned[api] then warned[api] = true; S.Log.Warn(api, "not supported") end
-        return false
+    local function wo(a) 
+        if not warned[a] then warned[a] = true; S.Log.Warn(a, "not supported") end 
+        return false 
     end
     
-    _G.writefile = getapi("writefile") or function(f, c) return warnonce("writefile") end
-    _G.readfile = getapi("readfile") or function(f) return nil end
-    _G.isfile = getapi("isfile") or function(f) return false end
-    _G.makefolder = getapi("makefolder") or function(f) return warnonce("makefolder") end
-    _G.setclipboard = getapi("setclipboard") or function(t) return warnonce("setclipboard") end
-    _G.setfpscap = getapi("setfpscap") or function(f) end
-
-    -- ================================================
-    -- CAPABILITIES (single table, inline detection)
-    -- ================================================
+    if not _G.writefile then _G.writefile = ga("writefile") or function(f,c) return wo("writefile") end end
+    if not _G.readfile then _G.readfile = ga("readfile") or function(f) return nil end end
+    if not _G.isfile then _G.isfile = ga("isfile") or function(f) return false end end
+    if not _G.makefolder then _G.makefolder = ga("makefolder") or function(f) return wo("makefolder") end end
+    if not _G.setclipboard then _G.setclipboard = ga("setclipboard") or function(t) return wo("setclipboard") end end
+    if not _G.setfpscap then _G.setfpscap = ga("setfpscap") or function(f) end end
+    
+    -- Capabilities
     S.Capabilities = {
-        FileIO = pcall(function() local f = ".t"..tick(); writefile(f, "x"); local r = readfile(f) == "x"; delfile(f); return r end),
+        FileIO = pcall(function() local f = ".t"..tick(); _G.writefile(f,"x"); local r=_G.readfile(f)=="x"; _G.delfile(f); return r end),
         HTTP = _G.request ~= nil or _G.http_request ~= nil,
         Clipboard = _G.setclipboard ~= nil
     }
     
-    S.DisableIfMissing = function(c, f)
-        if not S.Capabilities[c] then S.Log.Warn(f, "disabled - no", c); return true end
-        return false
-    end
-
-    -- ================================================
-    -- SAFE HTTP (with retry)
-    -- ================================================
-    S.HttpGet = function(url, retries)
-        retries = retries or 3
-        local req = request or http_request or (syn and syn.request)
-        if not req then S.Log.Warn("HTTP not available"); return nil end
-        
-        for i = 1, retries do
-            local ok, r = pcall(req, {Url = url, Method = "GET", Headers = {["User-Agent"] = "Sirius MAX/1.0"}})
-            if ok and r and ((r.StatusCode and r.StatusCode >= 200 and r.StatusCode < 300) or r.Success) then
-                return r.Body or r.body
+    -- Safe HTTP
+    S.HttpGet = function(url, r)
+        r = r or 3
+        local req = _G.request or _G.http_request or (syn and syn.request)
+        if not req then return nil end
+        for i = 1, r do
+            local ok, rs = pcall(req, {Url = url, Method = "GET", Headers = {["User-Agent"]="Sirius MAX/1.0"}})
+            if ok and rs and ((rs.StatusCode and rs.StatusCode >= 200 and rs.StatusCode < 300) or rs.Success) then
+                return rs.Body or rs.body
             end
-            if i < retries then task.wait(1) end
+            if i < r then task.wait(1) end
         end
         return nil
     end
-
-    -- ================================================
-    -- CRASH GUARD
-    -- ================================================
-    S.SafeCall = function(name, fn, ...)
+    
+    -- Crash Guard
+    S.SafeCall = function(n, fn, ...)
         if typeof(fn) ~= "function" then return nil end
         local ok, r = pcall(fn, ...)
-        if not ok then S.Log.Error("Crash in", name, ":", r) end
+        if not ok then S.Log.Error("Crash in", n, ":", r) end
         return ok and r or nil
     end
     
-    S.SafeLoop = function(name, fn, delay)
+    S.SafeLoop = function(n, fn, d)
         task.spawn(function()
             while true do
-                if not pcall(fn) then task.wait(1) else task.wait(delay or 0.1) end
+                if not pcall(fn) then task.wait(1) else task.wait(d or 0.1) end
             end
         end)
     end
-
-    -- ================================================
-    -- SAFE EDITOR
-    -- ================================================
+    
+    -- Safe Editor
     S.MAX_EDITOR_SIZE = 190000
     S.MOBILE_EDITOR_LIMIT = 100000
-    
-    S.SafeSetEditorText = function(editor, text)
-        if not editor or not editor:IsA("TextBox") then return end
-        local limit = S.ExecutorInfo.IsMobile and S.MOBILE_EDITOR_LIMIT or S.MAX_EDITOR_SIZE
-        if #text > limit then text = text:sub(1, limit) .. "\n\n-- [TRUNCATED]" end
-        pcall(function() editor.Text = text end)
+    S.SafeSetEditorText = function(ed, txt)
+        if not ed or not ed:IsA("TextBox") then return end
+        local lim = S.ExecutorInfo.IsMobile and S.MOBILE_EDITOR_LIMIT or S.MAX_EDITOR_SIZE
+        if #txt > lim then txt = txt:sub(1, lim) .. "\n\n-- [TRUNCATED]" end
+        pcall(function() ed.Text = txt end)
     end
-
-    -- ================================================
-    -- MOBILE MODE
-    -- ================================================
+    
+    -- Mobile Config
     S.MobileConfig = {MaxTabs = 10, Animations = true, SyntaxHighlight = true, BrowserMaxTabs = 5, FPSCap = 60}
-    
     if S.ExecutorInfo.IsMobile then
-        S.Log.Info("Mobile mode active")
         S.MobileConfig = {MaxTabs = 3, Animations = false, SyntaxHighlight = false, BrowserMaxTabs = 2, FPSCap = 30}
-        pcall(function() if setfpscap then setfpscap(30) end; settings().Rendering.QualityLevel = 1 end)
-        if _G.queueNotification then pcall(function() queueNotification("Sirius MAX", "Mobile mode enabled", 4370335364) end) end
+        pcall(function() if _G.setfpscap then _G.setfpscap(30) end; settings().Rendering.QualityLevel = 1 end)
     end
-
-    S.Log.Info("Stability System Ready")
+    
+    S.Log.Info("Stability Ready | Executor:", S.ExecutorInfo.Name, "| Mobile:", tostring(S.ExecutorInfo.IsMobile))
 end)()
-
 -- END STABILITY MODULES
+
 
 -- Create Variables for Roblox Services
 local coreGui = game:GetService("CoreGui")
