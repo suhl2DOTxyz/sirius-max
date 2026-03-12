@@ -212,7 +212,7 @@ local creatorId = game.CreatorId
 local noclipDefaults = {}
 local movers = {}
 local creatorType = game.CreatorType
-local espContainer = Instance.new("Folder", gethui and gethui() or coreGui)
+espContainer = Instance.new("Folder", gethui and gethui() or coreGui)
 local oldVolume = gameSettings.MasterVolume
 
 
@@ -1635,7 +1635,7 @@ local function createEsp(player)
 		return
 	end
 
-	local highlight = Instance.new("Highlight")
+	highlight = Instance.new("Highlight")
 	highlight.FillTransparency = 1
 	highlight.OutlineTransparency = 0
 	highlight.OutlineColor = Color3.new(1,1,1)
@@ -1774,7 +1774,7 @@ local function blurSignature(value)
 		end
 	else
 		if not lighting:FindFirstChild("SiriusBlur") then
-			local blurLight = Instance.new("DepthOfFieldEffect", lighting)
+			blurLight = Instance.new("DepthOfFieldEffect", lighting)
 			blurLight.Name = "SiriusBlur"
 			blurLight.Enabled = true
 			blurLight.FarIntensity = 0
@@ -1839,7 +1839,7 @@ local function queueNotification(Title, Description, Image)
 			table.insert(notifications, newNotification)
 			figureNotifications()
 
-			local notificationSound = Instance.new("Sound")
+			notificationSound = Instance.new("Sound")
 			notificationSound.Parent = UI
 			notificationSound.SoundId = "rbxassetid://255881176"
 			notificationSound.Name = "notificationSound"
@@ -1934,7 +1934,7 @@ local function playNext()
 	if #musicQueue == 0 then currentAudio.Playing = false currentAudio.SoundId = "" musicPanel.Playing.Text = "Not Playing" return end
 
 	if not currentAudio then
-		local newAudio = Instance.new("Sound")
+		newAudio = Instance.new("Sound")
 		newAudio.Parent = UI
 		newAudio.Name = "Audio"
 		currentAudio = newAudio
@@ -1981,7 +1981,7 @@ local function addToQueue(file)
 
 	table.insert(musicQueue, {sound = file, instanceName = newAudio.Name})
 
-	local getLength = Instance.new("Sound", workspace)
+	getLength = Instance.new("Sound", workspace)
 	getLength.SoundId = getcustomasset(siriusValues.siriusFolder.."/Music/"..file)
 	getLength.Volume = 0
 	getLength:Play()
@@ -2048,7 +2048,7 @@ end
 local function createReverb(timing)
 	for index, sound in next, soundInstances do
 		if not sound:FindFirstChild("SiriusAudioProfile") then
-			local reverb = Instance.new("EqualizerSoundEffect")
+			reverb = Instance.new("EqualizerSoundEffect")
 
 			reverb.Name = "SiriusAudioProfile"
 			reverb.Parent = sound
@@ -2588,7 +2588,7 @@ local function openPanel(panelName)
 		for _, sliderV in pairs(sliderInfo) do
 			if characterPanel.Interactions.Sliders:FindFirstChild(sliderV[1]) then
 				local slider = characterPanel.Interactions.Sliders:FindFirstChild(sliderV[1])
-				local tweenValue = Instance.new("IntValue", UI)
+				tweenValue = Instance.new("IntValue", UI)
 				local tweenTo
 				local name
 
@@ -2935,7 +2935,7 @@ local function openHome()
 	debounce = true
 	homeContainer.Visible = true
 
-	local homeBlur = Instance.new("BlurEffect", lighting)
+	homeBlur = Instance.new("BlurEffect", lighting)
 	homeBlur.Size = 0
 	homeBlur.Name = "HomeBlur"
 
@@ -3899,7 +3899,7 @@ local function createPlayer(player)
 
 		local highlight = espContainer:FindFirstChild(player.Name)
 		if not highlight then
-			local newHighlight = Instance.new("Highlight")
+			newHighlight = Instance.new("Highlight")
 			newHighlight.Name = player.Name
 			newHighlight.Adornee = player.Character
 			newHighlight.FillTransparency = 1
@@ -5063,7 +5063,7 @@ runService.Heartbeat:Connect(function()
 			bodyGyro.MaxTorque = Vector3.one * 9e9
 			bodyGyro.P = 9e4
 
-			local bodyAngularVelocity = Instance.new("BodyAngularVelocity")
+			bodyAngularVelocity = Instance.new("BodyAngularVelocity")
 			bodyAngularVelocity.AngularVelocity = Vector3.yAxis * 9e9
 			bodyAngularVelocity.MaxTorque = Vector3.yAxis * 9e9
 			bodyAngularVelocity.P = 9e9
@@ -6514,7 +6514,7 @@ end
 task.spawn(ensureSandbox)
 
 -- Create Executor UI Panel
-local executorPanel = Instance.new("Frame")
+executorPanel = Instance.new("Frame")
 executorPanel.Name = "ExecutorPanel"
 executorPanel.Size = UDim2.new(0, 700, 0, 450)
 executorPanel.Position = UDim2.new(0.5, -350, 0.5, -225)
@@ -6523,17 +6523,17 @@ executorPanel.BorderSizePixel = 0
 executorPanel.Visible = false
 executorPanel.Parent = UI
 
-local executorCorner = Instance.new("UICorner")
+executorCorner = Instance.new("UICorner")
 executorCorner.CornerRadius = UDim.new(0, 8)
 executorCorner.Parent = executorPanel
 
-local executorStroke = Instance.new("UIStroke")
+executorStroke = Instance.new("UIStroke")
 executorStroke.Color = Color3.fromRGB(40, 40, 48)
 executorStroke.Thickness = 1
 executorStroke.Parent = executorPanel
 
 -- Title Bar
-local executorTitle = Instance.new("TextLabel")
+executorTitle = Instance.new("TextLabel")
 executorTitle.Name = "Title"
 executorTitle.Size = UDim2.new(1, 0, 0, 40)
 executorTitle.BackgroundTransparency = 1
@@ -6544,26 +6544,26 @@ executorTitle.Font = Enum.Font.SourceSansBold
 executorTitle.Parent = executorPanel
 
 -- Tab Bar
-local tabBar = Instance.new("Frame")
+tabBar = Instance.new("Frame")
 tabBar.Name = "TabBar"
 tabBar.Size = UDim2.new(1, -20, 0, 35)
 tabBar.Position = UDim2.new(0, 10, 0, 40)
 tabBar.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
 tabBar.BorderSizePixel = 0
-local tabBarCorner = Instance.new("UICorner")
+tabBarCorner = Instance.new("UICorner")
 tabBarCorner.CornerRadius = UDim.new(0, 6)
 tabBarCorner.Parent = tabBar
 tabBar.Parent = executorPanel
 
 -- Tab Container (ScrollingFrame for many tabs)
-local tabContainer = Instance.new("ScrollingFrame")
+tabContainer = Instance.new("ScrollingFrame")
 tabContainer.Name = "TabContainer"
 tabContainer.Size = UDim2.new(1, -80, 1, 0)
 tabContainer.BackgroundTransparency = 1
 tabContainer.BorderSizePixel = 0
 tabContainer.ScrollBarThickness = 2
 tabContainer.ScrollingDirection = Enum.ScrollingDirection.X
-local tabListLayout = Instance.new("UIListLayout")
+tabListLayout = Instance.new("UIListLayout")
 tabListLayout.FillDirection = Enum.FillDirection.Horizontal
 tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 tabListLayout.Padding = UDim.new(0, 5)
@@ -6571,7 +6571,7 @@ tabListLayout.Parent = tabContainer
 tabContainer.Parent = tabBar
 
 -- New Tab Button
-local newTabButton = Instance.new("TextButton")
+newTabButton = Instance.new("TextButton")
 newTabButton.Name = "NewTab"
 newTabButton.Size = UDim2.new(0, 70, 0, 25)
 newTabButton.Position = UDim2.new(1, -75, 0.5, -12.5)
@@ -6580,36 +6580,36 @@ newTabButton.Text = "+ New Tab"
 newTabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 newTabButton.TextSize = 12
 newTabButton.Font = Enum.Font.SourceSansBold
-local newTabCorner = Instance.new("UICorner")
+newTabCorner = Instance.new("UICorner")
 newTabCorner.CornerRadius = UDim.new(0, 6)
 newTabCorner.Parent = newTabButton
 newTabButton.Parent = tabBar
 
 -- Editor Container
-local editorContainer = Instance.new("Frame")
+editorContainer = Instance.new("Frame")
 editorContainer.Name = "EditorContainer"
 editorContainer.Size = UDim2.new(1, -20, 0, 320)
 editorContainer.Position = UDim2.new(0, 10, 0, 80)
 editorContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
 editorContainer.BorderSizePixel = 0
-local editorCorner = Instance.new("UICorner")
+editorCorner = Instance.new("UICorner")
 editorCorner.CornerRadius = UDim.new(0, 6)
 editorCorner.Parent = editorContainer
 editorContainer.Parent = executorPanel
 
 -- Line Numbers Frame
-local lineNumbersFrame = Instance.new("Frame")
+lineNumbersFrame = Instance.new("Frame")
 lineNumbersFrame.Name = "LineNumbers"
 lineNumbersFrame.Size = UDim2.new(0, 40, 1, 0)
 lineNumbersFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
 lineNumbersFrame.BorderSizePixel = 0
-local lineNumbersCorner = Instance.new("UICorner")
+lineNumbersCorner = Instance.new("UICorner")
 lineNumbersCorner.CornerRadius = UDim.new(0, 6)
 lineNumbersCorner.Parent = lineNumbersFrame
 lineNumbersFrame.Parent = editorContainer
 
 -- Editor Scrolling Frame (virtualized container)
-local editorScroll = Instance.new("ScrollingFrame")
+editorScroll = Instance.new("ScrollingFrame")
 editorScroll.Name = "EditorScroll"
 editorScroll.Size = UDim2.new(1, -50, 1, -10)
 editorScroll.Position = UDim2.new(0, 45, 0, 5)
@@ -6620,7 +6620,7 @@ editorScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 editorScroll.Parent = editorContainer
 
 -- Code Input Box
-local codeBox = Instance.new("TextBox")
+codeBox = Instance.new("TextBox")
 codeBox.Name = "CodeBox"
 codeBox.Size = UDim2.new(1, 0, 1, 0)
 codeBox.BackgroundTransparency = 1
@@ -6635,7 +6635,7 @@ codeBox.TextYAlignment = Enum.TextYAlignment.Top
 codeBox.Parent = editorScroll
 
 -- Button Bar
-local buttonBar = Instance.new("Frame")
+buttonBar = Instance.new("Frame")
 buttonBar.Name = "ButtonBar"
 buttonBar.Size = UDim2.new(1, -20, 0, 40)
 buttonBar.Position = UDim2.new(0, 10, 1, -50)
@@ -6643,7 +6643,7 @@ buttonBar.BackgroundTransparency = 1
 buttonBar.Parent = executorPanel
 
 -- Execute Button
-local executeButton = Instance.new("TextButton")
+executeButton = Instance.new("TextButton")
 executeButton.Name = "Execute"
 executeButton.Size = UDim2.new(0, 100, 0, 35)
 executeButton.Position = UDim2.new(0, 0, 0, 0)
@@ -6652,13 +6652,13 @@ executeButton.Text = "▶ Execute"
 executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 executeButton.TextSize = 14
 executeButton.Font = Enum.Font.SourceSansBold
-local executeCorner = Instance.new("UICorner")
+executeCorner = Instance.new("UICorner")
 executeCorner.CornerRadius = UDim.new(0, 6)
 executeCorner.Parent = executeButton
 executeButton.Parent = buttonBar
 
 -- Clear Button
-local clearButton = Instance.new("TextButton")
+clearButton = Instance.new("TextButton")
 clearButton.Name = "Clear"
 clearButton.Size = UDim2.new(0, 80, 0, 35)
 clearButton.Position = UDim2.new(0, 110, 0, 0)
@@ -6667,13 +6667,13 @@ clearButton.Text = "✕ Clear"
 clearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 clearButton.TextSize = 14
 clearButton.Font = Enum.Font.SourceSansBold
-local clearCorner = Instance.new("UICorner")
+clearCorner = Instance.new("UICorner")
 clearCorner.CornerRadius = UDim.new(0, 6)
 clearCorner.Parent = clearButton
 clearButton.Parent = buttonBar
 
 -- Save Button
-local saveButton = Instance.new("TextButton")
+saveButton = Instance.new("TextButton")
 saveButton.Name = "Save"
 saveButton.Size = UDim2.new(0, 80, 0, 35)
 saveButton.Position = UDim2.new(0, 200, 0, 0)
@@ -6682,13 +6682,13 @@ saveButton.Text = "💾 Save"
 saveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 saveButton.TextSize = 14
 saveButton.Font = Enum.Font.SourceSansBold
-local saveCorner = Instance.new("UICorner")
+saveCorner = Instance.new("UICorner")
 saveCorner.CornerRadius = UDim.new(0, 6)
 saveCorner.Parent = saveButton
 saveButton.Parent = buttonBar
 
 -- Load Button
-local loadButton = Instance.new("TextButton")
+loadButton = Instance.new("TextButton")
 loadButton.Name = "Load"
 loadButton.Size = UDim2.new(0, 80, 0, 35)
 loadButton.Position = UDim2.new(0, 290, 0, 0)
@@ -6697,13 +6697,13 @@ loadButton.Text = "📂 Load"
 loadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadButton.TextSize = 14
 loadButton.Font = Enum.Font.SourceSansBold
-local loadCorner = Instance.new("UICorner")
+loadCorner = Instance.new("UICorner")
 loadCorner.CornerRadius = UDim.new(0, 6)
 loadCorner.Parent = loadButton
 loadButton.Parent = buttonBar
 
 -- Syntax Highlight Toggle
-local syntaxToggle = Instance.new("TextButton")
+syntaxToggle = Instance.new("TextButton")
 syntaxToggle.Name = "SyntaxToggle"
 syntaxToggle.Size = UDim2.new(0, 120, 0, 35)
 syntaxToggle.Position = UDim2.new(1, -120, 0, 0)
@@ -6712,13 +6712,13 @@ syntaxToggle.Text = "🔍 Syntax: ON"
 syntaxToggle.TextColor3 = Color3.fromRGB(200, 200, 200)
 syntaxToggle.TextSize = 12
 syntaxToggle.Font = Enum.Font.SourceSans
-local syntaxCorner = Instance.new("UICorner")
+syntaxCorner = Instance.new("UICorner")
 syntaxCorner.CornerRadius = UDim.new(0, 6)
 syntaxCorner.Parent = syntaxToggle
 syntaxToggle.Parent = buttonBar
 
 -- Close Button
-local executorClose = Instance.new("TextButton")
+executorClose = Instance.new("TextButton")
 executorClose.Name = "Close"
 executorClose.Size = UDim2.new(0, 30, 0, 30)
 executorClose.Position = UDim2.new(1, -35, 0, 5)
@@ -6754,7 +6754,7 @@ function ExecutorSystem:CreateTab(name, content)
 	self.TabCounter = self.TabCounter + 1
 	local tabId = "Tab_" .. self.TabCounter
 
-	local tabButton = Instance.new("TextButton")
+	tabButton = Instance.new("TextButton")
 	tabButton.Name = tabId
 	tabButton.Size = UDim2.new(0, 100, 0, 30)
 	tabButton.BackgroundColor3 = Color3.fromRGB(26, 148, 255)
@@ -6763,11 +6763,11 @@ function ExecutorSystem:CreateTab(name, content)
 	tabButton.TextSize = 12
 	tabButton.Font = Enum.Font.SourceSans
 	tabButton.LayoutOrder = self.TabCounter
-	local tabCorner = Instance.new("UICorner")
+	tabCorner = Instance.new("UICorner")
 	tabCorner.CornerRadius = UDim.new(0, 4)
 	tabCorner.Parent = tabButton
 
-	local closeTabBtn = Instance.new("TextButton")
+	closeTabBtn = Instance.new("TextButton")
 	closeTabBtn.Name = "Close"
 	closeTabBtn.Size = UDim2.new(0, 16, 0, 16)
 	closeTabBtn.Position = UDim2.new(1, -18, 0.5, -8)
@@ -6965,7 +6965,7 @@ function VirtualizedEditor:UpdateLineNumbers()
 	-- Only show up to 50 line numbers at a time for performance
 	local displayCount = math.min(lineCount, 50)
 	for i = 1, displayCount do
-		local label = Instance.new("TextLabel")
+		label = Instance.new("TextLabel")
 		label.Size = UDim2.new(1, 0, 0, 16)
 		label.Position = UDim2.new(0, 0, 0, (i - 1) * 16)
 		label.BackgroundTransparency = 1
@@ -6979,7 +6979,7 @@ function VirtualizedEditor:UpdateLineNumbers()
 
 	-- Indicator for more lines
 	if lineCount > 50 then
-		local moreLabel = Instance.new("TextLabel")
+		moreLabel = Instance.new("TextLabel")
 		moreLabel.Size = UDim2.new(1, 0, 0, 16)
 		moreLabel.Position = UDim2.new(0, 0, 0, 50 * 16)
 		moreLabel.BackgroundTransparency = 1
@@ -7144,7 +7144,7 @@ function ScriptFileManager:ShowFileBrowser()
 	end
 
 	-- Create browser frame (simplified inline version)
-	local browserFrame = Instance.new("Frame")
+	browserFrame = Instance.new("Frame")
 	browserFrame.Name = "FileBrowser"
 	browserFrame.Size = UDim2.new(0, 300, 0, 400)
 	browserFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
@@ -7152,11 +7152,11 @@ function ScriptFileManager:ShowFileBrowser()
 	browserFrame.BorderSizePixel = 0
 	browserFrame.Parent = executorPanel
 
-	local browserCorner = Instance.new("UICorner")
+	browserCorner = Instance.new("UICorner")
 	browserCorner.CornerRadius = UDim.new(0, 8)
 	browserCorner.Parent = browserFrame
 
-	local browserTitle = Instance.new("TextLabel")
+	browserTitle = Instance.new("TextLabel")
 	browserTitle.Size = UDim2.new(1, 0, 0, 30)
 	browserTitle.BackgroundTransparency = 1
 	browserTitle.Text = "Script Files"
@@ -7165,7 +7165,7 @@ function ScriptFileManager:ShowFileBrowser()
 	browserTitle.Font = Enum.Font.SourceSansBold
 	browserTitle.Parent = browserFrame
 
-	local fileListFrame = Instance.new("ScrollingFrame")
+	fileListFrame = Instance.new("ScrollingFrame")
 	fileListFrame.Size = UDim2.new(1, -20, 1, -80)
 	fileListFrame.Position = UDim2.new(0, 10, 0, 40)
 	fileListFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
@@ -7173,14 +7173,14 @@ function ScriptFileManager:ShowFileBrowser()
 	fileListFrame.ScrollBarThickness = 4
 	fileListFrame.Parent = browserFrame
 
-	local listLayout = Instance.new("UIListLayout")
+	listLayout = Instance.new("UIListLayout")
 	listLayout.SortOrder = Enum.SortOrder.Name
 	listLayout.Padding = UDim.new(0, 5)
 	listLayout.Parent = fileListFrame
 
 	-- Populate file list
 	for _, filename in ipairs(files) do
-		local fileButton = Instance.new("TextButton")
+		fileButton = Instance.new("TextButton")
 		fileButton.Size = UDim2.new(1, -10, 0, 30)
 		fileButton.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 		fileButton.Text = filename
@@ -7189,7 +7189,7 @@ function ScriptFileManager:ShowFileBrowser()
 		fileButton.Font = Enum.Font.SourceSans
 		fileButton.Parent = fileListFrame
 
-		local fileCorner = Instance.new("UICorner")
+		fileCorner = Instance.new("UICorner")
 		fileCorner.CornerRadius = UDim.new(0, 4)
 		fileCorner.Parent = fileButton
 
@@ -7206,7 +7206,7 @@ function ScriptFileManager:ShowFileBrowser()
 	end
 
 	-- Close button
-	local closeBrowser = Instance.new("TextButton")
+	closeBrowser = Instance.new("TextButton")
 	closeBrowser.Size = UDim2.new(0, 80, 0, 30)
 	closeBrowser.Position = UDim2.new(0.5, -40, 1, -40)
 	closeBrowser.BackgroundColor3 = Color3.fromRGB(184, 85, 61)
@@ -7216,7 +7216,7 @@ function ScriptFileManager:ShowFileBrowser()
 	closeBrowser.Font = Enum.Font.SourceSansBold
 	closeBrowser.Parent = browserFrame
 
-	local closeCorner = Instance.new("UICorner")
+	closeCorner = Instance.new("UICorner")
 	closeCorner.CornerRadius = UDim.new(0, 6)
 	closeCorner.Parent = closeBrowser
 
@@ -7240,7 +7240,7 @@ saveButton.MouseButton1Click:Connect(function()
 	local defaultName = ScriptFileManager.CurrentFile or (tab and tab.name:match("^Untitled") and "script.lua" or (tab and tab.name) or "script.lua")
 
 	-- Create simple save dialog
-	local saveDialog = Instance.new("Frame")
+	saveDialog = Instance.new("Frame")
 	saveDialog.Name = "SaveDialog"
 	saveDialog.Size = UDim2.new(0, 300, 0, 150)
 	saveDialog.Position = UDim2.new(0.5, -150, 0.5, -75)
@@ -7248,11 +7248,11 @@ saveButton.MouseButton1Click:Connect(function()
 	saveDialog.BorderSizePixel = 0
 	saveDialog.Parent = executorPanel
 
-	local dialogCorner = Instance.new("UICorner")
+	dialogCorner = Instance.new("UICorner")
 	dialogCorner.CornerRadius = UDim.new(0, 8)
 	dialogCorner.Parent = saveDialog
 
-	local filenameLabel = Instance.new("TextLabel")
+	filenameLabel = Instance.new("TextLabel")
 	filenameLabel.Size = UDim2.new(1, -20, 0, 25)
 	filenameLabel.Position = UDim2.new(0, 10, 0, 10)
 	filenameLabel.BackgroundTransparency = 1
@@ -7262,7 +7262,7 @@ saveButton.MouseButton1Click:Connect(function()
 	filenameLabel.Font = Enum.Font.SourceSans
 	filenameLabel.Parent = saveDialog
 
-	local filenameInput = Instance.new("TextBox")
+	filenameInput = Instance.new("TextBox")
 	filenameInput.Size = UDim2.new(1, -20, 0, 30)
 	filenameInput.Position = UDim2.new(0, 10, 0, 40)
 	filenameInput.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
@@ -7273,11 +7273,11 @@ saveButton.MouseButton1Click:Connect(function()
 	filenameInput.ClearTextOnFocus = false
 	filenameInput.Parent = saveDialog
 
-	local inputCorner = Instance.new("UICorner")
+	inputCorner = Instance.new("UICorner")
 	inputCorner.CornerRadius = UDim.new(0, 6)
 	inputCorner.Parent = filenameInput
 
-	local saveConfirm = Instance.new("TextButton")
+	saveConfirm = Instance.new("TextButton")
 	saveConfirm.Size = UDim2.new(0, 80, 0, 30)
 	saveConfirm.Position = UDim2.new(0.5, -90, 1, -45)
 	saveConfirm.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
@@ -7287,11 +7287,11 @@ saveButton.MouseButton1Click:Connect(function()
 	saveConfirm.Font = Enum.Font.SourceSansBold
 	saveConfirm.Parent = saveDialog
 
-	local saveConfirmCorner = Instance.new("UICorner")
+	saveConfirmCorner = Instance.new("UICorner")
 	saveConfirmCorner.CornerRadius = UDim.new(0, 6)
 	saveConfirmCorner.Parent = saveConfirm
 
-	local cancelButton = Instance.new("TextButton")
+	cancelButton = Instance.new("TextButton")
 	cancelButton.Size = UDim2.new(0, 80, 0, 30)
 	cancelButton.Position = UDim2.new(0.5, 10, 1, -45)
 	cancelButton.BackgroundColor3 = Color3.fromRGB(184, 85, 61)
@@ -7301,7 +7301,7 @@ saveButton.MouseButton1Click:Connect(function()
 	cancelButton.Font = Enum.Font.SourceSansBold
 	cancelButton.Parent = saveDialog
 
-	local cancelCorner = Instance.new("UICorner")
+	cancelCorner = Instance.new("UICorner")
 	cancelCorner.CornerRadius = UDim.new(0, 6)
 	cancelCorner.Parent = cancelButton
 
@@ -7444,7 +7444,7 @@ function ScriptBloxAutoFinder:ToggleAutoExecute()
 end
 
 -- Create ScriptBlox UI Panel
-local scriptbloxPanel = Instance.new("Frame")
+scriptbloxPanel = Instance.new("Frame")
 scriptbloxPanel.Name = "ScriptBloxPanel"
 scriptbloxPanel.Size = UDim2.new(0, 400, 0, 300)
 scriptbloxPanel.Position = UDim2.new(0.5, -200, 0.5, -150)
@@ -7453,11 +7453,11 @@ scriptbloxPanel.BorderSizePixel = 0
 scriptbloxPanel.Visible = false
 scriptbloxPanel.Parent = UI
 
-local sbCorner = Instance.new("UICorner")
+sbCorner = Instance.new("UICorner")
 sbCorner.CornerRadius = UDim.new(0, 8)
 sbCorner.Parent = scriptbloxPanel
 
-local sbTitle = Instance.new("TextLabel")
+sbTitle = Instance.new("TextLabel")
 sbTitle.Name = "Title"
 sbTitle.Size = UDim2.new(1, 0, 0, 40)
 sbTitle.BackgroundTransparency = 1
@@ -7509,7 +7509,7 @@ searchCorner.Parent = searchBtn
 searchBtn.Parent = scriptbloxPanel
 
 -- Execute Top Button
-local execTopBtn = Instance.new("TextButton")
+execTopBtn = Instance.new("TextButton")
 execTopBtn.Name = "ExecTop"
 execTopBtn.Size = UDim2.new(0, 120, 0, 35)
 execTopBtn.Position = UDim2.new(1, -135, 0, 50)
@@ -7518,13 +7518,13 @@ execTopBtn.Text = "▶ Execute Top"
 execTopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 execTopBtn.TextSize = 12
 execTopBtn.Font = Enum.Font.SourceSansBold
-local execCorner = Instance.new("UICorner")
+execCorner = Instance.new("UICorner")
 execCorner.CornerRadius = UDim.new(0, 6)
 execCorner.Parent = execTopBtn
 execTopBtn.Parent = scriptbloxPanel
 
 -- Results Frame
-local resultsFrame = Instance.new("ScrollingFrame")
+resultsFrame = Instance.new("ScrollingFrame")
 resultsFrame.Name = "Results"
 resultsFrame.Size = UDim2.new(1, -30, 1, -110)
 resultsFrame.Position = UDim2.new(0, 15, 0, 95)
@@ -7534,7 +7534,7 @@ resultsFrame.ScrollBarThickness = 4
 resultsFrame.Parent = scriptbloxPanel
 
 -- Game Info Label
-local gameInfoLabel = Instance.new("TextLabel")
+gameInfoLabel = Instance.new("TextLabel")
 gameInfoLabel.Name = "GameInfo"
 gameInfoLabel.Size = UDim2.new(1, -30, 0, 25)
 gameInfoLabel.Position = UDim2.new(0, 15, 1, -30)
@@ -7660,7 +7660,7 @@ function MusicSystem:Play(filename)
 			self:Stop()
 
 			-- Create new audio
-			local audio = Instance.new("Sound")
+			audio = Instance.new("Sound")
 			audio.Name = "SiriusMusic"
 			audio.SoundId = getcustomasset and getcustomasset(filepath) or filepath
 			audio.Volume = self.Volume
@@ -7738,7 +7738,7 @@ function MusicSystem:TogglePlay()
 end
 
 -- Music UI Panel
-local musicPanel = Instance.new("Frame")
+musicPanel = Instance.new("Frame")
 musicPanel.Name = "MusicPanel"
 musicPanel.Size = UDim2.new(0, 350, 0, 250)
 musicPanel.Position = UDim2.new(0.5, -175, 0.5, -125)
@@ -7747,11 +7747,11 @@ musicPanel.BorderSizePixel = 0
 musicPanel.Visible = false
 musicPanel.Parent = UI
 
-local musicCorner = Instance.new("UICorner")
+musicCorner = Instance.new("UICorner")
 musicCorner.CornerRadius = UDim.new(0, 8)
 musicCorner.Parent = musicPanel
 
-local musicTitle = Instance.new("TextLabel")
+musicTitle = Instance.new("TextLabel")
 musicTitle.Name = "Title"
 musicTitle.Size = UDim2.new(1, 0, 0, 40)
 musicTitle.BackgroundTransparency = 1
@@ -7761,7 +7761,7 @@ musicTitle.TextSize = 18
 musicTitle.Font = Enum.Font.SourceSansBold
 musicTitle.Parent = musicPanel
 
-local musicClose = Instance.new("TextButton")
+musicClose = Instance.new("TextButton")
 musicClose.Name = "Close"
 musicClose.Size = UDim2.new(0, 30, 0, 30)
 musicClose.Position = UDim2.new(1, -35, 0, 5)
@@ -7773,7 +7773,7 @@ musicClose.Font = Enum.Font.SourceSansBold
 musicClose.Parent = musicPanel
 
 -- Now Playing Label
-local nowPlaying = Instance.new("TextLabel")
+nowPlaying = Instance.new("TextLabel")
 nowPlaying.Name = "NowPlaying"
 nowPlaying.Size = UDim2.new(1, -30, 0, 30)
 nowPlaying.Position = UDim2.new(0, 15, 0, 50)
@@ -7786,7 +7786,7 @@ nowPlaying.TextXAlignment = Enum.TextXAlignment.Center
 nowPlaying.Parent = musicPanel
 
 -- Controls Frame
-local controlsFrame = Instance.new("Frame")
+controlsFrame = Instance.new("Frame")
 controlsFrame.Name = "Controls"
 controlsFrame.Size = UDim2.new(1, -30, 0, 50)
 controlsFrame.Position = UDim2.new(0, 15, 0, 90)
@@ -7794,7 +7794,7 @@ controlsFrame.BackgroundTransparency = 1
 controlsFrame.Parent = musicPanel
 
 -- Previous Button
-local prevBtn = Instance.new("TextButton")
+prevBtn = Instance.new("TextButton")
 prevBtn.Name = "Prev"
 prevBtn.Size = UDim2.new(0, 60, 0, 40)
 prevBtn.Position = UDim2.new(0.5, -95, 0, 5)
@@ -7803,13 +7803,13 @@ prevBtn.Text = "⏮"
 prevBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 prevBtn.TextSize = 20
 prevBtn.Font = Enum.Font.SourceSansBold
-local prevCorner = Instance.new("UICorner")
+prevCorner = Instance.new("UICorner")
 prevCorner.CornerRadius = UDim.new(0, 6)
 prevCorner.Parent = prevBtn
 prevBtn.Parent = controlsFrame
 
 -- Play/Stop Button
-local playStopBtn = Instance.new("TextButton")
+playStopBtn = Instance.new("TextButton")
 playStopBtn.Name = "PlayStop"
 playStopBtn.Size = UDim2.new(0, 60, 0, 40)
 playStopBtn.Position = UDim2.new(0.5, -30, 0, 5)
@@ -7818,13 +7818,13 @@ playStopBtn.Text = "▶"
 playStopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 playStopBtn.TextSize = 20
 playStopBtn.Font = Enum.Font.SourceSansBold
-local playCorner = Instance.new("UICorner")
+playCorner = Instance.new("UICorner")
 playCorner.CornerRadius = UDim.new(0, 6)
 playCorner.Parent = playStopBtn
 playStopBtn.Parent = controlsFrame
 
 -- Next Button
-local nextBtn = Instance.new("TextButton")
+nextBtn = Instance.new("TextButton")
 nextBtn.Name = "Next"
 nextBtn.Size = UDim2.new(0, 60, 0, 40)
 nextBtn.Position = UDim2.new(0.5, 35, 0, 5)
@@ -7833,13 +7833,13 @@ nextBtn.Text = "⏭"
 nextBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 nextBtn.TextSize = 20
 nextBtn.Font = Enum.Font.SourceSansBold
-local nextCorner = Instance.new("UICorner")
+nextCorner = Instance.new("UICorner")
 nextCorner.CornerRadius = UDim.new(0, 6)
 nextCorner.Parent = nextBtn
 nextBtn.Parent = controlsFrame
 
 -- Track List Frame
-local trackListFrame = Instance.new("ScrollingFrame")
+trackListFrame = Instance.new("ScrollingFrame")
 trackListFrame.Name = "TrackList"
 trackListFrame.Size = UDim2.new(1, -30, 0, 80)
 trackListFrame.Position = UDim2.new(0, 15, 1, -95)
@@ -7848,7 +7848,7 @@ trackListFrame.BorderSizePixel = 0
 trackListFrame.ScrollBarThickness = 4
 trackListFrame.Parent = musicPanel
 
-local trackLayout = Instance.new("UIListLayout")
+trackLayout = Instance.new("UIListLayout")
 trackLayout.SortOrder = Enum.SortOrder.Name
 trackLayout.Padding = UDim.new(0, 5)
 trackLayout.Parent = trackListFrame
@@ -7865,7 +7865,7 @@ function MusicSystem:RefreshTrackList()
 	local files = self:ScanMusicFolder()
 
 	if #files == 0 then
-		local emptyLabel = Instance.new("TextLabel")
+		emptyLabel = Instance.new("TextLabel")
 		emptyLabel.Size = UDim2.new(1, 0, 0, 30)
 		emptyLabel.BackgroundTransparency = 1
 		emptyLabel.Text = "No music files found"
@@ -7877,7 +7877,7 @@ function MusicSystem:RefreshTrackList()
 	end
 
 	for _, filename in ipairs(files) do
-		local trackBtn = Instance.new("TextButton")
+		trackBtn = Instance.new("TextButton")
 		trackBtn.Size = UDim2.new(1, -10, 0, 25)
 		trackBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 		trackBtn.Text = filename
@@ -7886,7 +7886,7 @@ function MusicSystem:RefreshTrackList()
 		trackBtn.Font = Enum.Font.SourceSans
 		trackBtn.Parent = trackListFrame
 
-		local trackCorner = Instance.new("UICorner")
+		trackCorner = Instance.new("UICorner")
 		trackCorner.CornerRadius = UDim.new(0, 4)
 		trackCorner.Parent = trackBtn
 
@@ -7982,7 +7982,7 @@ local BrowserSystem = {
 }
 
 -- Browser UI Panel
-local browserPanel = Instance.new("Frame")
+browserPanel = Instance.new("Frame")
 browserPanel.Name = "BrowserPanel"
 browserPanel.Size = UDim2.new(0, 800, 0, 600)
 browserPanel.Position = UDim2.new(0.5, -400, 0.5, -300)
@@ -7991,12 +7991,12 @@ browserPanel.BorderSizePixel = 0
 browserPanel.Visible = false
 browserPanel.Parent = UI
 
-local browserCorner = Instance.new("UICorner")
+browserCorner = Instance.new("UICorner")
 browserCorner.CornerRadius = UDim.new(0, 8)
 browserCorner.Parent = browserPanel
 
 -- Title Bar
-local browserTitle = Instance.new("TextLabel")
+browserTitle = Instance.new("TextLabel")
 browserTitle.Name = "Title"
 browserTitle.Size = UDim2.new(1, 0, 0, 35)
 browserTitle.BackgroundTransparency = 1
@@ -8006,7 +8006,7 @@ browserTitle.TextSize = 16
 browserTitle.Font = Enum.Font.SourceSansBold
 browserTitle.Parent = browserPanel
 
-local browserClose = Instance.new("TextButton")
+browserClose = Instance.new("TextButton")
 browserClose.Name = "Close"
 browserClose.Size = UDim2.new(0, 30, 0, 30)
 browserClose.Position = UDim2.new(1, -35, 0, 2)
@@ -8018,32 +8018,32 @@ browserClose.Font = Enum.Font.SourceSansBold
 browserClose.Parent = browserPanel
 
 -- Tab Bar
-local browserTabBar = Instance.new("Frame")
+browserTabBar = Instance.new("Frame")
 browserTabBar.Name = "TabBar"
 browserTabBar.Size = UDim2.new(1, -20, 0, 35)
 browserTabBar.Position = UDim2.new(0, 10, 0, 35)
 browserTabBar.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
 browserTabBar.BorderSizePixel = 0
-local tabBarCorner2 = Instance.new("UICorner")
+tabBarCorner2 = Instance.new("UICorner")
 tabBarCorner2.CornerRadius = UDim.new(0, 6)
 tabBarCorner2.Parent = browserTabBar
 browserTabBar.Parent = browserPanel
 
-local browserTabContainer = Instance.new("ScrollingFrame")
+browserTabContainer = Instance.new("ScrollingFrame")
 browserTabContainer.Name = "TabContainer"
 browserTabContainer.Size = UDim2.new(1, -40, 1, 0)
 browserTabContainer.BackgroundTransparency = 1
 browserTabContainer.BorderSizePixel = 0
 browserTabContainer.ScrollBarThickness = 2
 browserTabContainer.ScrollingDirection = Enum.ScrollingDirection.X
-local browserTabLayout = Instance.new("UIListLayout")
+browserTabLayout = Instance.new("UIListLayout")
 browserTabLayout.FillDirection = Enum.FillDirection.Horizontal
 browserTabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 browserTabLayout.Padding = UDim.new(0, 5)
 browserTabLayout.Parent = browserTabContainer
 browserTabContainer.Parent = browserTabBar
 
-local newBrowserTabBtn = Instance.new("TextButton")
+newBrowserTabBtn = Instance.new("TextButton")
 newBrowserTabBtn.Name = "NewTab"
 newBrowserTabBtn.Size = UDim2.new(0, 30, 0, 25)
 newBrowserTabBtn.Position = UDim2.new(1, -35, 0.5, -12.5)
@@ -8052,25 +8052,25 @@ newBrowserTabBtn.Text = "+"
 newBrowserTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 newBrowserTabBtn.TextSize = 16
 newBrowserTabBtn.Font = Enum.Font.SourceSansBold
-local newTabBtnCorner = Instance.new("UICorner")
+newTabBtnCorner = Instance.new("UICorner")
 newTabBtnCorner.CornerRadius = UDim.new(0, 4)
 newTabBtnCorner.Parent = newBrowserTabBtn
 newBrowserTabBtn.Parent = browserTabBar
 
 -- Address Bar
-local addressBarFrame = Instance.new("Frame")
+addressBarFrame = Instance.new("Frame")
 addressBarFrame.Name = "AddressBar"
 addressBarFrame.Size = UDim2.new(1, -20, 0, 35)
 addressBarFrame.Position = UDim2.new(0, 10, 0, 75)
 addressBarFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
 addressBarFrame.BorderSizePixel = 0
-local addrCorner = Instance.new("UICorner")
+addrCorner = Instance.new("UICorner")
 addrCorner.CornerRadius = UDim.new(0, 6)
 addrCorner.Parent = addressBarFrame
 addressBarFrame.Parent = browserPanel
 
 -- Navigation Buttons
-local backBtn = Instance.new("TextButton")
+backBtn = Instance.new("TextButton")
 backBtn.Name = "Back"
 backBtn.Size = UDim2.new(0, 35, 0, 25)
 backBtn.Position = UDim2.new(0, 5, 0.5, -12.5)
@@ -8079,12 +8079,12 @@ backBtn.Text = "←"
 backBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 backBtn.TextSize = 16
 backBtn.Font = Enum.Font.SourceSansBold
-local backCorner = Instance.new("UICorner")
+backCorner = Instance.new("UICorner")
 backCorner.CornerRadius = UDim.new(0, 4)
 backCorner.Parent = backBtn
 backBtn.Parent = addressBarFrame
 
-local forwardBtn = Instance.new("TextButton")
+forwardBtn = Instance.new("TextButton")
 forwardBtn.Name = "Forward"
 forwardBtn.Size = UDim2.new(0, 35, 0, 25)
 forwardBtn.Position = UDim2.new(0, 45, 0.5, -12.5)
@@ -8093,12 +8093,12 @@ forwardBtn.Text = "→"
 forwardBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 forwardBtn.TextSize = 16
 forwardBtn.Font = Enum.Font.SourceSansBold
-local forwardCorner = Instance.new("UICorner")
+forwardCorner = Instance.new("UICorner")
 forwardCorner.CornerRadius = UDim.new(0, 4)
 forwardCorner.Parent = forwardBtn
 forwardBtn.Parent = addressBarFrame
 
-local reloadBtn = Instance.new("TextButton")
+reloadBtn = Instance.new("TextButton")
 reloadBtn.Name = "Reload"
 reloadBtn.Size = UDim2.new(0, 35, 0, 25)
 reloadBtn.Position = UDim2.new(0, 85, 0.5, -12.5)
@@ -8107,12 +8107,12 @@ reloadBtn.Text = "↻"
 reloadBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 reloadBtn.TextSize = 16
 reloadBtn.Font = Enum.Font.SourceSansBold
-local reloadCorner = Instance.new("UICorner")
+reloadCorner = Instance.new("UICorner")
 reloadCorner.CornerRadius = UDim.new(0, 4)
 reloadCorner.Parent = reloadBtn
 reloadBtn.Parent = addressBarFrame
 
-local goBtn = Instance.new("TextButton")
+goBtn = Instance.new("TextButton")
 goBtn.Name = "Go"
 goBtn.Size = UDim2.new(0, 40, 0, 25)
 goBtn.Position = UDim2.new(1, -45, 0.5, -12.5)
@@ -8121,12 +8121,12 @@ goBtn.Text = "Go"
 goBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 goBtn.TextSize = 12
 goBtn.Font = Enum.Font.SourceSansBold
-local goCorner = Instance.new("UICorner")
+goCorner = Instance.new("UICorner")
 goCorner.CornerRadius = UDim.new(0, 4)
 goCorner.Parent = goBtn
 goBtn.Parent = addressBarFrame
 
-local urlInput = Instance.new("TextBox")
+urlInput = Instance.new("TextBox")
 urlInput.Name = "URL"
 urlInput.Size = UDim2.new(1, -180, 0, 25)
 urlInput.Position = UDim2.new(0, 130, 0.5, -12.5)
@@ -8138,12 +8138,12 @@ urlInput.Font = Enum.Font.SourceSans
 urlInput.ClearTextOnFocus = false
 urlInput.Parent = addressBarFrame
 
-local urlCorner = Instance.new("UICorner")
+urlCorner = Instance.new("UICorner")
 urlCorner.CornerRadius = UDim.new(0, 4)
 urlCorner.Parent = urlInput
 
 -- Content Area (Virtualized - only active tab content shown)
-local browserContent = Instance.new("ScrollingFrame")
+browserContent = Instance.new("ScrollingFrame")
 browserContent.Name = "Content"
 browserContent.Size = UDim2.new(1, -20, 1, -130)
 browserContent.Position = UDim2.new(0, 10, 0, 115)
@@ -8153,7 +8153,7 @@ browserContent.ScrollBarThickness = 6
 browserContent.Parent = browserPanel
 
 -- Content Text Label (simplified HTML rendering)
-local contentLabel = Instance.new("TextLabel")
+contentLabel = Instance.new("TextLabel")
 contentLabel.Name = "ContentLabel"
 contentLabel.Size = UDim2.new(1, -20, 0, 1000)
 contentLabel.Position = UDim2.new(0, 10, 0, 10)
@@ -8190,7 +8190,7 @@ function BrowserSystem:CreateTab(url)
 	self.TabCounter = self.TabCounter + 1
 	local tabId = "BrowserTab_" .. self.TabCounter
 
-	local tabButton = Instance.new("TextButton")
+	tabButton = Instance.new("TextButton")
 	tabButton.Name = tabId
 	tabButton.Size = UDim2.new(0, 120, 0, 28)
 	tabButton.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
@@ -8200,11 +8200,11 @@ function BrowserSystem:CreateTab(url)
 	tabButton.Font = Enum.Font.SourceSans
 	tabButton.LayoutOrder = self.TabCounter
 
-	local tabBtnCorner = Instance.new("UICorner")
+	tabBtnCorner = Instance.new("UICorner")
 	tabBtnCorner.CornerRadius = UDim.new(0, 4)
 	tabBtnCorner.Parent = tabButton
 
-	local closeTabBtn2 = Instance.new("TextButton")
+	closeTabBtn2 = Instance.new("TextButton")
 	closeTabBtn2.Name = "Close"
 	closeTabBtn2.Size = UDim2.new(0, 16, 0, 16)
 	closeTabBtn2.Position = UDim2.new(1, -18, 0.5, -8)
@@ -8503,7 +8503,7 @@ local PerformanceSystem = {
 }
 
 -- FPS Monitor
-local fpsMonitor = Instance.new("Frame")
+fpsMonitor = Instance.new("Frame")
 fpsMonitor.Name = "FPSMonitor"
 fpsMonitor.Size = UDim2.new(0, 120, 0, 30)
 fpsMonitor.Position = UDim2.new(1, -130, 0, 10)
@@ -8512,11 +8512,11 @@ fpsMonitor.BorderSizePixel = 0
 fpsMonitor.Visible = false
 fpsMonitor.Parent = UI
 
-local fpsMonitorCorner = Instance.new("UICorner")
+fpsMonitorCorner = Instance.new("UICorner")
 fpsMonitorCorner.CornerRadius = UDim.new(0, 6)
 fpsMonitorCorner.Parent = fpsMonitor
 
-local fpsLabel = Instance.new("TextLabel")
+fpsLabel = Instance.new("TextLabel")
 fpsLabel.Name = "FPSLabel"
 fpsLabel.Size = UDim2.new(1, 0, 1, 0)
 fpsLabel.BackgroundTransparency = 1
@@ -8530,7 +8530,7 @@ ThemeManager:Register(fpsMonitor, "BackgroundColor3", "SecondaryBackground")
 ThemeManager:Register(fpsLabel, "TextColor3", "Success")
 
 -- Performance Settings Panel
-local perfPanel = Instance.new("Frame")
+perfPanel = Instance.new("Frame")
 perfPanel.Name = "PerformancePanel"
 perfPanel.Size = UDim2.new(0, 350, 0, 450)
 perfPanel.Position = UDim2.new(0.5, -175, 0.5, -225)
@@ -8539,11 +8539,11 @@ perfPanel.BorderSizePixel = 0
 perfPanel.Visible = false
 perfPanel.Parent = UI
 
-local perfCorner = Instance.new("UICorner")
+perfCorner = Instance.new("UICorner")
 perfCorner.CornerRadius = UDim.new(0, 8)
 perfCorner.Parent = perfPanel
 
-local perfTitle = Instance.new("TextLabel")
+perfTitle = Instance.new("TextLabel")
 perfTitle.Name = "Title"
 perfTitle.Size = UDim2.new(1, 0, 0, 40)
 perfTitle.BackgroundTransparency = 1
@@ -8553,7 +8553,7 @@ perfTitle.TextSize = 18
 perfTitle.Font = Enum.Font.SourceSansBold
 perfTitle.Parent = perfPanel
 
-local perfClose = Instance.new("TextButton")
+perfClose = Instance.new("TextButton")
 perfClose.Name = "Close"
 perfClose.Size = UDim2.new(0, 30, 0, 30)
 perfClose.Position = UDim2.new(1, -35, 0, 5)
@@ -8564,7 +8564,7 @@ perfClose.TextSize = 18
 perfClose.Font = Enum.Font.SourceSansBold
 perfClose.Parent = perfPanel
 
-local perfScroll = Instance.new("ScrollingFrame")
+perfScroll = Instance.new("ScrollingFrame")
 perfScroll.Name = "SettingsScroll"
 perfScroll.Size = UDim2.new(1, -20, 1, -60)
 perfScroll.Position = UDim2.new(0, 10, 0, 50)
@@ -8573,7 +8573,7 @@ perfScroll.BorderSizePixel = 0
 perfScroll.ScrollBarThickness = 4
 perfScroll.Parent = perfPanel
 
-local perfLayout = Instance.new("UIListLayout")
+perfLayout = Instance.new("UIListLayout")
 perfLayout.FillDirection = Enum.FillDirection.Vertical
 perfLayout.SortOrder = Enum.SortOrder.LayoutOrder
 perfLayout.Padding = UDim.new(0, 10)
@@ -8581,18 +8581,18 @@ perfLayout.Parent = perfScroll
 
 -- Toggle Button Creator
 local function CreatePerfToggle(name, setting, default)
-	local toggleFrame = Instance.new("Frame")
+	toggleFrame = Instance.new("Frame")
 	toggleFrame.Name = name .. "Toggle"
 	toggleFrame.Size = UDim2.new(1, 0, 0, 40)
 	toggleFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 	toggleFrame.BorderSizePixel = 0
 	toggleFrame.LayoutOrder = #perfScroll:GetChildren()
 	
-	local toggleCorner = Instance.new("UICorner")
+	toggleCorner = Instance.new("UICorner")
 	toggleCorner.CornerRadius = UDim.new(0, 6)
 	toggleCorner.Parent = toggleFrame
 	
-	local label = Instance.new("TextLabel")
+	label = Instance.new("TextLabel")
 	label.Name = "Label"
 	label.Size = UDim2.new(0.7, 0, 1, 0)
 	label.Position = UDim2.new(0, 10, 0, 0)
@@ -8604,7 +8604,7 @@ local function CreatePerfToggle(name, setting, default)
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.Parent = toggleFrame
 	
-	local toggleBtn = Instance.new("TextButton")
+	toggleBtn = Instance.new("TextButton")
 	toggleBtn.Name = "Toggle"
 	toggleBtn.Size = UDim2.new(0, 50, 0, 24)
 	toggleBtn.Position = UDim2.new(1, -60, 0.5, -12)
@@ -8615,7 +8615,7 @@ local function CreatePerfToggle(name, setting, default)
 	toggleBtn.Font = Enum.Font.SourceSansBold
 	toggleBtn.AutoButtonColor = false
 	
-	local btnCorner = Instance.new("UICorner")
+	btnCorner = Instance.new("UICorner")
 	btnCorner.CornerRadius = UDim.new(0, 4)
 	btnCorner.Parent = toggleBtn
 	toggleBtn.Parent = toggleFrame
@@ -8660,18 +8660,18 @@ CreatePerfToggle("FPS Monitor", "ShowFPSMonitor", false)
 CreatePerfToggle("Auto GC Cycle", "AutoGCCycle", true)
 
 -- Quality Slider
-local qualityFrame = Instance.new("Frame")
+qualityFrame = Instance.new("Frame")
 qualityFrame.Name = "QualityFrame"
 qualityFrame.Size = UDim2.new(1, 0, 0, 60)
 qualityFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 qualityFrame.BorderSizePixel = 0
 qualityFrame.LayoutOrder = 10
 
-local qualityCorner = Instance.new("UICorner")
+qualityCorner = Instance.new("UICorner")
 qualityCorner.CornerRadius = UDim.new(0, 6)
 qualityCorner.Parent = qualityFrame
 
-local qualityLabel = Instance.new("TextLabel")
+qualityLabel = Instance.new("TextLabel")
 qualityLabel.Name = "Label"
 qualityLabel.Size = UDim2.new(1, -20, 0, 20)
 qualityLabel.Position = UDim2.new(0, 10, 0, 5)
@@ -8683,7 +8683,7 @@ qualityLabel.Font = Enum.Font.SourceSans
 qualityLabel.TextXAlignment = Enum.TextXAlignment.Left
 qualityLabel.Parent = qualityFrame
 
-local qualitySlider = Instance.new("TextButton")
+qualitySlider = Instance.new("TextButton")
 qualitySlider.Name = "Slider"
 qualitySlider.Size = UDim2.new(1, -20, 0, 8)
 qualitySlider.Position = UDim2.new(0, 10, 0, 35)
@@ -8692,18 +8692,18 @@ qualitySlider.Text = ""
 qualitySlider.AutoButtonColor = false
 qualitySlider.Parent = qualityFrame
 
-local sliderCorner = Instance.new("UICorner")
+sliderCorner = Instance.new("UICorner")
 sliderCorner.CornerRadius = UDim.new(0, 4)
 sliderCorner.Parent = qualitySlider
 
-local sliderFill = Instance.new("Frame")
+sliderFill = Instance.new("Frame")
 sliderFill.Name = "Fill"
 sliderFill.Size = UDim2.new(1, 0, 1, 0)
 sliderFill.BackgroundColor3 = Color3.fromRGB(26, 148, 255)
 sliderFill.BorderSizePixel = 0
 sliderFill.Parent = qualitySlider
 
-local fillCorner = Instance.new("UICorner")
+fillCorner = Instance.new("UICorner")
 fillCorner.CornerRadius = UDim.new(0, 4)
 fillCorner.Parent = sliderFill
 
