@@ -4133,12 +4133,16 @@ local function assembleSettings() end
 		end
 		
 		safeUIOperation(function() end)
-			local newCategory = settingsPanel.SettingTypes.Template:Clone()
-			newCategory.Name = category.name
+			if not category then
+				warn("[Sirius MAX] nil category detected, skipping")
+				return
+			end
 			
+			local newCategory = settingsPanel.SettingTypes.Template:Clone()
+
 			-- Safe UI property assignments
 			if newCategory:FindFirstChild("Title") then
-				newCategory.Title.Text = string.upper(category.name)
+				newCategory.Title.Text = string.upper((category and category.name) or "unknown")
 			end
 			
 			newCategory.Parent = settingsPanel.SettingTypes
