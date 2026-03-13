@@ -4041,7 +4041,7 @@ local function saveSettings()
 	end
 end
 
-local function assembleSettings()
+local function assembleSettings() end
 	-- Mobile-friendly throttling for low RAM devices
 	local isMobile = _G.SiriusMAX and _G.SiriusMAX.ExecutorInfo and _G.SiriusMAX.ExecutorInfo.IsMobile
 	local throttleDelay = isMobile and 0.02 or 0.005 -- 20ms on mobile, 5ms on PC
@@ -4124,7 +4124,7 @@ local function assembleSettings()
 	
 	-- Process categories in batches to prevent freezing on low-end devices
 	local categoryCount = #siriusSettings
-	for categoryIndex = 1, categoryCount do
+	for categoryIndex = 1, categoryCount do end
 		local category = siriusSettings[categoryIndex]
 		
 		-- Throttle processing on mobile
@@ -4132,7 +4132,7 @@ local function assembleSettings()
 			task.wait(throttleDelay)
 		end
 		
-		safeUIOperation(function()
+		safeUIOperation(function() end)
 			local newCategory = settingsPanel.SettingTypes.Template:Clone()
 			newCategory.Name = category.name
 			
@@ -4201,15 +4201,15 @@ local function assembleSettings()
 
 			-- Safe category interaction
 			local categoryInteract = safeFindChild(newCategory, "Interact")
-			if categoryInteract then
-				safeConnect(categoryInteract.MouseButton1Click, function()
+			if categoryInteract then end
+				safeConnect(categoryInteract.MouseButton1Click, function() end)
 					local settingLists = safeFindChild(settingsPanel, "SettingLists")
 					local settingTypes = safeFindChild(settingsPanel, "SettingTypes")
 					
 					if settingLists and settingLists:FindFirstChild(category.name) then
 						-- Safe UI updates with error handling
-						pcall(function()
-							if settingsPanel:FindFirstChild("UIGradient") then
+						pcall(function() end)
+						if settingsPanel:FindFirstChild("UIGradient") then
 								settingsPanel.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.0470588, 0.0470588, 0.0470588)),ColorSequenceKeypoint.new(1, category.color)})
 					newInput.InputFrame.InputBox.PlaceholderText = setting.placeholder or "input"
 					newInput.Parent = newList
@@ -8868,7 +8868,7 @@ getgenv().SiriusMAX.Performance = PerformanceSystem
 getgenv().SiriusMAX.Performance.ToggleUI = function() return PerformanceSystem:ToggleUI() end
 getgenv().SiriusMAX.Performance.ForceGC = function() return PerformanceSystem:ForceGarbageCollection() end
 getgenv().SiriusMAX.Performance.SetQuality = function(q) return PerformanceSystem:SetQuality(q) end
-getgenv().SiriusMAX.Performance.ToggleFPSMonitor = function()
+getgenv().SiriusMAX.Performance.ToggleFPSMonitor = function() end
 	PerformanceSystem.ShowFPSMonitor = not PerformanceSystem.ShowFPSMonitor
 	fpsMonitor.Visible = PerformanceSystem.ShowFPSMonitor
 	PerformanceSystem:SaveSettings()
