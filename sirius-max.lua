@@ -4042,14 +4042,59 @@ local function saveSettings()
 end
 
 local function assembleSettings()
+	-- Mobile-friendly throttling for low RAM devices
+	local isMobile = _G.SiriusMAX and _G.SiriusMAX.ExecutorInfo and _G.SiriusMAX.ExecutorInfo.IsMobile
+	local throttleDelay = isMobile and 0.02 or 0.005 -- 20ms on mobile, 5ms on PC
+	local maxSettingsPerBatch = isMobile and 3 or 8 -- Process fewer settings at once on mobile
+	
+	-- Safe wrapper for UI operations
+	local function safeUIOperation(operation, errorMessage)
+		if _G.SiriusMAX and _G.SiriusMAX.SafeCall then
+			return _G.SiriusMAX.SafeCall(errorMessage or "UI Operation", operation)
+		else
+			local success, result = pcall(operation)
+			if not success then
+				warn("[Sirius MAX] " .. (errorMessage or "UI Operation") .. " failed:", result)
+				return nil
+			end
+			return result
+		end
+	end
+	
+	-- Safe child finder with timeout
+	local function safeFindChild(parent, childName, timeout)
+		timeout = timeout or 0.5
+		local startTime = tick()
+		
+		while tick() - startTime < timeout do
+			if parent and parent.FindFirstChild then
+				local child = parent:FindFirstChild(childName)
+				if child then return child end
+			end
+			task.wait(0.01)
+		end
+		return nil
+	end
+	
+	-- Safe event connection
+	local function safeConnect(signal, handler, errorMsg)
+		if signal and signal.Connect then
+			pcall(function()
+				signal:Connect(handler)
+			end)
+		else
+			warn("[Sirius MAX] " .. (errorMsg or "Failed to connect event - signal not found"))
+		end
+	end
 	if isfile and isfile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile) then
 		local currentSettings
 
-		local success, response = pcall(function()
-			currentSettings = httpService:JSONDecode(readfile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile))
-		end)
+		local success, response = safeUIOperation(function()
+			return httpService:JSONDecode(readfile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile))
+		end, "Settings file decode")
 
-		if success then
+		if success and response then
+			currentSettings = response
 			for _, liveCategory in ipairs(siriusSettings) do
 				for _, liveSetting in ipairs(liveCategory.categorySettings) do
 					for _, category in ipairs(currentSettings) do
@@ -4062,157 +4107,110 @@ local function assembleSettings()
 				end
 			end
 
-			writefile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile, httpService:JSONEncode(siriusSettings)) -- Update file with any new settings added
+			safeUIOperation(function()
+				writefile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile, httpService:JSONEncode(siriusSettings))
+			end, "Settings file update")
 		end
 	else
 		if writefile then
 			checkFolder()
 			if not isfile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile) then
-				writefile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile, httpService:JSONEncode(siriusSettings))
+				safeUIOperation(function()
+					writefile(siriusValues.siriusFolder.."/"..siriusValues.settingsFile, httpService:JSONEncode(siriusSettings))
+				end, "Initial settings file creation")
 			end
 		end 
 	end
-
-	for _, category in siriusSettings do
-		local newCategory = settingsPanel.SettingTypes.Template:Clone()
-		newCategory.Name = category.name
-		newCategory.Title.Text = string.upper(category.name)
-		newCategory.Parent = settingsPanel.SettingTypes
-		newCategory.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.0392157, 0.0392157, 0.0392157)),ColorSequenceKeypoint.new(1, category.color)})
-
-		newCategory.Visible = true
-
-		local hue, sat, val = Color3.toHSV(category.color)
-
-		hue = math.clamp(hue + 0.01, 0, 1) sat = math.clamp(sat + 0.1, 0, 1) val = math.clamp(val + 0.2, 0, 1)
-
-		local newColor = Color3.fromHSV(hue, sat, val)
-		newCategory.UIStroke.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.117647, 0.117647, 0.117647)),ColorSequenceKeypoint.new(1, newColor)})
-		newCategory.Shadow.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.117647, 0.117647, 0.117647)),ColorSequenceKeypoint.new(1, newColor)})
-
-		local newList = settingsPanel.SettingLists.Template:Clone()
-		newList.Name = category.name
-		newList.Parent = settingsPanel.SettingLists
-
-		newList.Visible = true
-
-		for _, obj in ipairs(newList:GetChildren()) do if obj.Name ~= "Placeholder" and obj.Name ~= "UIListLayout" then obj:Destroy() end end 
-
-		settingsPanel.Back.MouseButton1Click:Connect(function()
-			tweenService:Create(settingsPanel.Back, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
-			tweenService:Create(settingsPanel.Back, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Position = UDim2.new(0.002, 0, 0.052, 0)}):Play()
-			tweenService:Create(settingsPanel.Title, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Position = UDim2.new(0.045, 0, 0.057, 0)}):Play()
-			tweenService:Create(settingsPanel.UIGradient, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, 1.3)}):Play()
-			settingsPanel.Title.Text = "Settings"
-			settingsPanel.Subtitle.Text = "Adjust your preferences, set new keybinds, test out new features and more"
-			settingsPanel.SettingTypes.Visible = true
-			settingsPanel.SettingLists.Visible = false
-		end)
-
-		newCategory.Interact.MouseButton1Click:Connect(function()
-			if settingsPanel.SettingLists:FindFirstChild(category.name) then
-				settingsPanel.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.0470588, 0.0470588, 0.0470588)),ColorSequenceKeypoint.new(1, category.color)})
-				settingsPanel.SettingTypes.Visible = false
-				settingsPanel.SettingLists.Visible = true
-				settingsPanel.SettingLists.UIPageLayout:JumpTo(settingsPanel.SettingLists[category.name])
-				settingsPanel.Subtitle.Text = category.description
-				settingsPanel.Back.Visible = true
-				settingsPanel.Title.Text = category.name
-
-				local gradientRotation = math.random(78, 95)
-				settingsPanel.UIGradient.Rotation = gradientRotation
-				tweenService:Create(settingsPanel.UIGradient, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, 0.65)}):Play()
-				tweenService:Create(settingsPanel.Back, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {ImageTransparency = 0}):Play()
-				tweenService:Create(settingsPanel.Back, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Position = UDim2.new(0.041, 0, 0.052, 0)}):Play()
-				tweenService:Create(settingsPanel.Title, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Position = UDim2.new(0.091, 0, 0.057, 0)}):Play()
-			else
-				-- error
-				closeSettings()
+	
+	-- Process categories in batches to prevent freezing on low-end devices
+	local categoryCount = #siriusSettings
+	for categoryIndex = 1, categoryCount do
+		local category = siriusSettings[categoryIndex]
+		
+		-- Throttle processing on mobile
+		if isMobile and categoryIndex % maxSettingsPerBatch == 0 then
+			task.wait(throttleDelay)
+		end
+		
+		safeUIOperation(function()
+			local newCategory = settingsPanel.SettingTypes.Template:Clone()
+			newCategory.Name = category.name
+			
+			-- Safe UI property assignments
+			if newCategory:FindFirstChild("Title") then
+				newCategory.Title.Text = string.upper(category.name)
 			end
-		end)
+			
+			newCategory.Parent = settingsPanel.SettingTypes
+			
+			if newCategory:FindFirstChild("UIGradient") then
+				newCategory.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.0392157, 0.0392157, 0.0392157)),ColorSequenceKeypoint.new(1, category.color)})
+			end
 
-		newCategory.MouseEnter:Connect(function()
-			tweenService:Create(newCategory.Title, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {TextTransparency = 0}):Play()
-			tweenService:Create(newCategory.UIGradient, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Offset = Vector2.new(0, 0.4)}):Play()
-			tweenService:Create(newCategory.UIStroke.UIGradient, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Offset = Vector2.new(0, 0.2)}):Play()
-			tweenService:Create(newCategory.Shadow.UIGradient, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Offset = Vector2.new(0, 0.2)}):Play()
-		end)
+			newCategory.Visible = true
 
-		newCategory.MouseLeave:Connect(function()
-			tweenService:Create(newCategory.Title, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {TextTransparency = 0.2}):Play()
-			tweenService:Create(newCategory.UIGradient, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Offset = Vector2.new(0, 0.65)}):Play()
-			tweenService:Create(newCategory.UIStroke.UIGradient, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Offset = Vector2.new(0, 0.4)}):Play()
-			tweenService:Create(newCategory.Shadow.UIGradient, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Offset = Vector2.new(0, 0.4)}):Play()
-		end)
+			local hue, sat, val = Color3.toHSV(category.color)
+			hue = math.clamp(hue + 0.01, 0, 1) sat = math.clamp(sat + 0.1, 0, 1) val = math.clamp(val + 0.2, 0, 1)
+			local newColor = Color3.fromHSV(hue, sat, val)
+			
+			-- Safe gradient updates
+			if newCategory:FindFirstChild("UIStroke") and newCategory.UIStroke:FindFirstChild("UIGradient") then
+				newCategory.UIStroke.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.117647, 0.117647, 0.117647)),ColorSequenceKeypoint.new(1, newColor)})
+			end
+			
+			if newCategory:FindFirstChild("Shadow") and newCategory.Shadow:FindFirstChild("UIGradient") then
+				newCategory.Shadow.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.117647, 0.117647, 0.117647)),ColorSequenceKeypoint.new(1, newColor)})
+			end
 
-		for _, setting in ipairs(category.categorySettings) do
-			if not setting.hidden then
-				local settingType = setting.settingType
-				local minimumLicense = setting.minimumLicense
-				local object = nil
+			local newList = settingsPanel.SettingLists.Template:Clone()
+			newList.Name = category.name
+			newList.Parent = settingsPanel.SettingLists
+			newList.Visible = true
 
-				if settingType == "Boolean" then
-					local newSwitch = settingsPanel.SettingLists.Template.SwitchTemplate:Clone()
-					object = newSwitch
-					newSwitch.Name = setting.name
-					newSwitch.Parent = newList
-					newSwitch.Visible = true
-					newSwitch.Title.Text = setting.name
+			-- Clear existing children safely
+			for _, obj in ipairs(newList:GetChildren()) do 
+				if obj.Name ~= "Placeholder" and obj.Name ~= "UIListLayout" then 
+					pcall(function() obj:Destroy() end) 
+				end 
+			end
 
-					if setting.current == true then
-						newSwitch.Switch.Indicator.Position = UDim2.new(1, -20, 0.5, 0)
-						newSwitch.Switch.Indicator.UIStroke.Color = Color3.fromRGB(220, 220, 220)
-						newSwitch.Switch.Indicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)			
-						newSwitch.Switch.Indicator.BackgroundTransparency = 0.6
-					end
-
-
-					if minimumLicense then
-						if (minimumLicense == "Pro" and not Pro) or (minimumLicense == "Essential" and not (Pro or Essential)) then
-							newSwitch.Switch.Indicator.Position = UDim2.new(1, -40, 0.5, 0)
-							newSwitch.Switch.Indicator.UIStroke.Color = Color3.fromRGB(255, 255, 255)
-							newSwitch.Switch.Indicator.BackgroundColor3 = Color3.fromRGB(235, 235, 235)			
-							newSwitch.Switch.Indicator.BackgroundTransparency = 0.75
-						end
-					end
-
-					newSwitch.Interact.MouseButton1Click:Connect(function()
-						if minimumLicense then
-							if (minimumLicense == "Pro" and not Pro) or (minimumLicense == "Essential" and not (Pro or Essential)) then
-								queueNotification("This feature is locked", "You must be "..minimumLicense.." or higher to use "..setting.name..". \n\nUpgrade at https://sirius.menu.", 4483345875)
-								return
-							end
-						end
-
-						setting.current = not setting.current
-						saveSettings()
-						if setting.current == true then
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -20, 0.5, 0)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,12,0,12)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Color = Color3.fromRGB(200, 200, 200)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.5}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.6}):Play()
-							task.wait(0.05)
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,17,0,17)}):Play()							
-						else
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -40, 0.5, 0)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,12,0,12)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Color = Color3.fromRGB(255, 255, 255)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.7}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(235, 235, 235)}):Play()
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.75}):Play()
-							task.wait(0.05)
-							tweenService:Create(newSwitch.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,17,0,17)}):Play()
-						end
+			-- Safe event connections for navigation
+			local backBtn = safeFindChild(settingsPanel, "Back")
+			if backBtn then
+				safeConnect(backBtn.MouseButton1Click, function()
+					-- Safe tween operations
+					pcall(function()
+						tweenService:Create(settingsPanel.Back, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {ImageTransparency = 1}):Play()
+						tweenService:Create(settingsPanel.Back, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Position = UDim2.new(0.002, 0, 0.052, 0)}):Play()
+						tweenService:Create(settingsPanel.Title, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Position = UDim2.new(0.045, 0, 0.057, 0)}):Play()
+						tweenService:Create(settingsPanel.UIGradient, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Offset = Vector2.new(0, 1.3)}):Play()
 					end)
+					
+					-- Safe text updates
+					local title = safeFindChild(settingsPanel, "Title")
+					local subtitle = safeFindChild(settingsPanel, "Subtitle")
+					local settingTypes = safeFindChild(settingsPanel, "SettingTypes")
+					local settingLists = safeFindChild(settingsPanel, "SettingLists")
+					
+					if title then title.Text = "Settings" end
+					if subtitle then subtitle.Text = "Adjust your preferences, set new keybinds, test out new features and more" end
+					if settingTypes then settingTypes.Visible = true end
+					if settingLists then settingLists.Visible = false end
+				end, "Back button click handler")
+			end
 
-				elseif settingType == "Input" then
-					local newInput = settingsPanel.SettingLists.Template.InputTemplate:Clone()
-					object = newInput
-
-					newInput.Name = setting.name
-					newInput.InputFrame.InputBox.Text = setting.current
+			-- Safe category interaction
+			local categoryInteract = safeFindChild(newCategory, "Interact")
+			if categoryInteract then
+				safeConnect(categoryInteract.MouseButton1Click, function()
+					local settingLists = safeFindChild(settingsPanel, "SettingLists")
+					local settingTypes = safeFindChild(settingsPanel, "SettingTypes")
+					
+					if settingLists and settingLists:FindFirstChild(category.name) then
+						-- Safe UI updates with error handling
+						pcall(function()
+							if settingsPanel:FindFirstChild("UIGradient") then
+								settingsPanel.UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.0470588, 0.0470588, 0.0470588)),ColorSequenceKeypoint.new(1, category.color)})
 					newInput.InputFrame.InputBox.PlaceholderText = setting.placeholder or "input"
 					newInput.Parent = newList
 
@@ -4430,134 +4428,53 @@ local function assembleSettings()
 						object.LicenseDisplay.Text = string.upper(minimumLicense).." FEATURE"
 					end
 
-					local objectTouching
-					object.MouseEnter:Connect(function()
-						objectTouching = true
-						tweenService:Create(object.UIStroke, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.45}):Play()
-						tweenService:Create(object, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.83}):Play()
-					end)
+						-- Safe hover effects for mobile compatibility
+						local objectTouching
+						safeConnect(object.MouseEnter, function()
+							objectTouching = true
+							pcall(function()
+								if object:FindFirstChild("UIStroke") then
+									tweenService:Create(object.UIStroke, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.45}):Play()
+								end
+								tweenService:Create(object, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.83}):Play()
+							end)
+						end, "Object mouse enter handler")
 
-					object.MouseLeave:Connect(function()
-						objectTouching = false
-						tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.6}):Play()
-						tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.9}):Play()
-					end)
-
-					if object:FindFirstChild('Interact') then
-						object.Interact.MouseButton1Click:Connect(function()
-							tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 1}):Play()
-							tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8}):Play()
-							task.wait(0.1)
-							if objectTouching then
-								tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.45}):Play()
-								tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.83}):Play()
-							else
-								tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.6}):Play()
+						safeConnect(object.MouseLeave, function()
+							objectTouching = false
+							pcall(function()
+								if object:FindFirstChild("UIStroke") then
+									tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.6}):Play()
+								end
 								tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.9}):Play()
-							end
-						end)
-					end
+							end)
+						end, "Object mouse leave handler")
+
+						-- Safe interaction handling
+						local interactBtn = safeFindChild(object, 'Interact')
+						if interactBtn then
+							safeConnect(interactBtn.MouseButton1Click, function()
+								pcall(function()
+									if object:FindFirstChild("UIStroke") then
+										tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 1}):Play()
+									end
+									tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8}):Play()
+									task.wait(0.1)
+									if objectTouching then
+										if object:FindFirstChild("UIStroke") then
+											tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.45}):Play()
+										end
+										tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.83}):Play()
+									else
+										if object:FindFirstChild("UIStroke") then
+											tweenService:Create(object.UIStroke, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Transparency = 0.6}):Play()
+										end
+										tweenService:Create(object, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.9}):Play()
+									end
+								end)
+							end, "Object interaction handler")
+						end
 				end
-			end
-		end
-	end
-end
-
-local function initialiseAntiKick()
-	if checkSetting("Client-Based Anti Kick").current then
-		if hookmetamethod then 
-			local originalIndex
-			local originalNamecall
-
-			originalIndex = hookmetamethod(game, "__index", function(self, method)
-				if self == localPlayer and method:lower() == "kick" and checkSetting("Client-Based Anti Kick").current and checkSirius() then
-					queueNotification("Kick Prevented", "Sirius has prevented you from being kicked by the client.", 4400699701)
-					return error("Expected ':' not '.' calling member function Kick", 2)
-				end
-				return originalIndex(self, method)
-			end)
-
-			originalNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-				if self == localPlayer and getnamecallmethod():lower() == "kick" and checkSetting("Client-Based Anti Kick").current and checkSirius() then
-					queueNotification("Kick Prevented", "Sirius has prevented you from being kicked by the client.", 4400699701)
-					return
-				end
-				return originalNamecall(self, ...)
-			end)
-		end
-	end
-end
-
-local function boost()
-	local success, result = pcall(function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Sirius/refs/heads/request/boost.lua'))()
-	end)
-
-	if not success then
-		print('Error with boost file.')
-		print(result)
-	end
-end
-
-local function start()
-	if siriusValues.releaseType == "Experimental" then -- Make this more secure.
-		if not Pro then localPlayer:Kick("This is an experimental release, you must be Pro to run this. \n\nUpgrade at https://sirius.menu/") return end
-	end
-	windowFocusChanged(true)
-
-	UI.Enabled = true
-
-	assembleSettings()
-	ensureFrameProperties()
-	sortActions()
-	initialiseAntiKick()
-	checkLastVersion()
-	task.spawn(boost)
-
-	smartBar.Time.Text = os.date("%H")..":"..os.date("%M")
-
-	toggle.Visible = not checkSetting("Hide Toggle Button").current
-
-	if not checkSetting("Load Hidden").current then 
-		--if checkSetting("Startup Sound Effect").current then
-		--	local startupPath = siriusValues.siriusFolder.."/Assets/startup.wav"
-		--	local startupAsset
-
-		--	if isfile(startupPath) then
-		--		startupAsset = getcustomasset(startupPath) or nil
-		--	else
-		--		startupAsset = fetchFromCDN("startup.wav", true, "Assets/startup.wav")
-		--		startupAsset = isfile(startupPath) and getcustomasset(startupPath) or nil
-		--	end
-
-		--	if not startupAsset then return end
-
-		--	local startupSound = Instance.new("Sound")
-		--	startupSound.Parent = UI
-		--	startupSound.SoundId = startupAsset
-		--	startupSound.Name = "startupSound"
-		--	startupSound.Volume = 0.85
-		--	startupSound.PlayOnRemove = true
-		--	startupSound:Destroy()	
-		--end
-
-		openSmartBar()
-	else 
-		closeSmartBar() 
-	end
-
-	if script_key and not (Essential or Pro) then
-		queueNotification("License Error", "We've detected a key being placed above Sirius loadstring, however your key seems to be invalid. Make a support request at sirius.menu/discord to get this solved within minutes.", "document-minus")
-	end
-
-	if siriusValues.enableExperienceSync then
-		task.spawn(syncExperienceInformation) 
-	end
-end
-
--- Sirius Events
-
-start()
 
 toggle.MouseButton1Click:Connect(function()
 	if smartBarOpen then
